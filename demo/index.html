@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link type="text/css" rel="stylesheet" href="//cloud.typography.com/75214/6517752/css/fonts.css" media="all" />
+    <link rel="stylesheet" href="https://cdn.byu.edu/byu-theme-components/latest/byu-theme-components.min.css" />
+    <script async src="https://cdn.byu.edu/byu-theme-components/latest/byu-theme-components.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta charset="UTF-8">
+    <title>Demo: BYU Person Lookup Component</title>
+    <style>
+        body { min-height: 100vh; display: flex; flex-direction: column; }
+        #content { flex: 1; }
+    </style>
+
+    <script type="module" src="../dist/byu-person-lookup.js"></script>
+</head>
+<body>
+    <byu-header>
+        <h1 slot="site-title">Demo: BYU Person Lookup Component</h1>
+    </byu-header>
+
+    <div id="content">
+
+        <byu-person-lookup></byu-person-lookup>
+        <div>
+            Last Name/Identifier: <input type="text" name="NAVpattern" size="10" >
+            First Name: <input type="text" name="NAVfirstName" size="10" >
+            <button>GO</button>
+        </div>
+
+    </div>
+
+    <byu-footer></byu-footer>
+
+</body>
+</html>
