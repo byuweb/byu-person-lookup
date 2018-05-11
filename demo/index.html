@@ -10,10 +10,12 @@
     <title>Demo: BYU Person Lookup Component</title>
     <style>
         body { min-height: 100vh; display: flex; flex-direction: column; }
-        #content { flex: 1; }
+        #content { flex: 1; padding: 0.5rem; }
     </style>
 
-    <script type="module" src="../dist/byu-person-lookup.js"></script>
+    <script type="module" src="../dist/byu-person-lookup-bundle.js"></script>
+    <script type="module" src="../dist/byu-person-lookup-results-bundle.js"></script>
+    <script type="module" src="../dist/test-svg-bundle.js"></script>
 </head>
 <body>
     <byu-header>
@@ -27,6 +29,12 @@
             Last Name/Identifier: <input type="text" name="NAVpattern" size="10" >
             First Name: <input type="text" name="NAVfirstName" size="10" >
             <button>GO</button>
+        </div>
+
+        <hr>
+
+        <div>
+            <test-svg h="250" w="400"></test-svg>
         </div>
 
     </div>
