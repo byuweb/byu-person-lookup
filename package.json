@@ -4,9 +4,8 @@
   "description": "A Web Component to look up a person, display a list of possible matches, and fire an event when a person is selected from a list.",
   "main": "index.js",
   "scripts": {
-    "dev": "rollup --watch -c rollup.config.js",
-    "build": "rollup -c rollup.config.js",
-    "build2": "byu-web-component-build",
+    "build": "byu-web-component-build",
+    "dev": "byu-web-component-build -w",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -15,7 +14,6 @@
   },
   "keywords": [
     "Web Component",
-    "Skate.js",
     "lit-html"
   ],
   "author": "Aaron Rasmussen <aaron.rasmussen@byu.edu>",
@@ -25,17 +23,11 @@
   },
   "homepage": "https://github.com/byuweb/byu-person-lookup#readme",
   "dependencies": {
-    "@fortawesome/fontawesome-free-solid": "^5.0.8",
+    "@fortawesome/fontawesome-free-solid": "^5.0.13",
     "@polymer/lit-element": "^0.5.1",
-    "@skatejs/renderer-lit-html": "^0.2.0",
-    "i": "^0.3.6",
-    "lit-html": "^0.10.0",
-    "npm": "^5.7.1",
-    "rollup": "^0.57.1",
-    "skatejs": "^5.1.1"
+    "lit-html": "^0.10.0"
   },
   "devDependencies": {
-    "rollup-plugin-commonjs": "^9.1.0",
-    "rollup-plugin-node-resolve": "^3.3.0"
+    "@byuweb/byu-web-component-build": "^1.1.0"
   }
 }

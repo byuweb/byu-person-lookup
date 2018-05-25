@@ -24,8 +24,8 @@ class ByuPersonLookup extends LitElement {
         * {
          font-family: 'Gotham A', 'Gotham B', Helvetica Nue, Helvetica, sans-serif; 
         }
-        @media not(speech) {
-          .srOnly { display: none }
+        @media not speech {
+          .sr-only { display: none }
         }
         input[type="search"] {
           padding: 0.3rem;
@@ -38,7 +38,7 @@ class ByuPersonLookup extends LitElement {
           padding: 0.3rem 0.7rem;
           border: thin solid #333333;
           border-radius: 0.2rem;
-          background-color: #2d83d9;
+          background-color: #1e61a4;
           color: white;
         }
       </style>
@@ -47,7 +47,7 @@ class ByuPersonLookup extends LitElement {
     return html`
     ${css}
     <div>
-      <label class="srOnly" for="search">Search For</label>
+      <label class="sr-only" for="search">Search For</label>
       <input
         id="search"
         type="search"
