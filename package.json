@@ -23,9 +23,11 @@
   },
   "homepage": "https://github.com/byuweb/byu-person-lookup#readme",
   "dependencies": {
+    "@byuweb/browser-oauth": "^0.3.1",
     "@fortawesome/fontawesome-free-solid": "^5.0.13",
     "@polymer/lit-element": "^0.5.1",
-    "lit-html": "^0.10.0"
+    "lit-html": "^0.10.0",
+    "lodash.get": "^4.4.2"
   },
   "devDependencies": {
     "@byuweb/byu-web-component-build": "^1.1.0"

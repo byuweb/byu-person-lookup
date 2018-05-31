@@ -1876,32 +1876,253 @@ class LitElement extends PropertiesMixin(HTMLElement) {
 
 var faSearch = { prefix: 'fas', iconName: 'search', icon: [512, 512, [], "f002", "M505 442.7L405.3 343c-4.5-4.5-10.6-7-17-7H372c27.6-35.3 44-79.7 44-128C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c48.3 0 92.7-16.4 128-44v16.3c0 6.4 2.5 12.5 7 17l99.7 99.7c9.4 9.4 24.6 9.4 33.9 0l28.3-28.3c9.4-9.4 9.4-24.6.1-34zM208 336c-70.7 0-128-57.2-128-128 0-70.7 57.2-128 128-128 70.7 0 128 57.2 128 128 0 70.7-57.2 128-128 128z"] };
 
+/*
+ * Copyright 2018 Brigham Young University
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+class ByuPersonLookupResults extends LitElement {
+  static get properties () {
+    return {
+      results: Array,
+      context: String
+    }
+  }
+
+  _render ({results, context}) {
+    console.log(`results=${Array.isArray(results)}`);
+    const css = html$1`
+      <style>
+        :host {
+          padding: 1rem;
+        }
+        * {
+         font-family: 'Gotham A', 'Gotham B', Helvetica Nue, Helvetica, sans-serif; 
+        }
+        .modal {
+          z-index: 98;
+          background-color: rgba(0, 0, 0, 0.6);
+          position: absolute;
+          left: 0;
+          right: 0;
+          top: 0;
+          bottom: 0;
+        }
+        .results {
+          z-index: 99;
+          position: absolute;
+          left: 0;
+          right: 0;
+          top: 20vh;
+          bottom: 0;
+          padding: 0.5rem;
+          background-color: white;
+          display: grid;
+          grid-template-columns: 1fr;
+          grid-auto-rows: auto;
+          grid-gap: 0.5rem;
+          overflow-y: auto;
+        }
+        table { border-collapse: collapse; }
+        th {
+          text-align: left;
+          background-color: #333333;
+          color: white;
+        }
+        tr { cursor: pointer; }
+        th, td {
+          padding: 0.5rem;
+          border-bottom: 1px solid #333333;
+        }
+        button {
+          font-size: 1.1rem;
+          padding: 0.3rem 0.7rem;
+          border: thin solid #333333;
+          border-radius: 0.2rem;
+          background-color: #1e61a4;
+          color: white;
+          cursor: pointer;
+          justify-self: center;
+          align-self: center;
+        }
+        @media only screen and (min-width: 900px) {
+          .results {
+            left: 10vw;
+            right: 10vw;
+            top: 10vh;
+            max-height: 85vh;
+          }
+        }
+      </style>
+    `;
+
+    const renderAddress = address => html$1`
+      <ul>
+        ${address.map(line => html$1`<li>${line}</li>`)}
+      </ul>
+    `;
+    const renderAdminRow = row => html$1`
+      <tr on-click="${e => this.select(row)}">
+        <td>${row.name}</td>
+        <td>${row.byuId}</td>
+        <td>${row.netId}</td>
+        <td>${row.employeeType}</td>
+        <td>${row.studentStatus}</td>
+      </tr>
+    `;
+
+    const renderDirectoryRow = row => html$1`
+      <tr on-click="${e => this.select(row)}">
+        <td>${row.name}</td>
+        <td>${row.addresses.mailing ? renderAddress(row.addresses.mailing) : ''}</td>
+        <td>${row.email}</td>
+      </tr>
+    `;
+
+    const renderAdmin = results => html$1`
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>BYU ID</th>
+            <th>Net ID</th>
+            <th>EMP Type</th>
+            <th>STD Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${results && results.map ? results.map(r => renderAdminRow(r)) : ''}
+        </tbody>
+      </table>
+    `;
+
+    const renderDirectory = results => html$1`
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Address</th>
+            <th>Email</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${results && results.map ? results.map(r => renderDirectoryRow(r)) : ''}
+        </tbody>
+      </table>
+    `;
+
+    if (!results || results.length < 1) {
+      return html$1``
+    }
+    return html$1`
+      ${css}
+      <div class="modal">
+        <div class="results">
+          ${context && context === 'admin' ? renderAdmin(results) : renderDirectory(results)}
+          <button on-click="${e => this.close()}">Close</button>
+        </div>
+      </div>
+    `
+  }
+
+  select (row) {
+    const {personId, byuId, netId, name} = row;
+    const evt = new CustomEvent('byu-lookup-results-select', {
+      detail: {
+        personId,
+        byuId,
+        netId,
+        name
+      },
+      bubbles: true,
+      composed: true
+    });
+    this.dispatchEvent(evt);
+    this.dispatchEvent(new CustomEvent('byu-lookup-results-close'));
+  }
+
+  close () {
+    this.dispatchEvent(new CustomEvent('byu-lookup-results-close'));
+  }
+}
+
+console.log('registering person lookup results');
+window.customElements.define('byu-person-lookup-results', ByuPersonLookupResults);
+
+/*
+ * Copyright 2018 Brigham Young University
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 class ByuPersonLookup extends LitElement {
   static get properties () {
     return {
       search: String,
-      results: Object
-      /* TODO: include search parameter type (person_id, home_town, etc..) */
+      results: Object,
+      context: String
     }
   }
 
-  _render ({search, results}) {
-    console.log(`search=${search}, results=${results}`);
+  static debounce (f, t) {
+    // console.log(`debounce::f=${f}, t=${t}`)
+    let timeout;
+    return (...args) => {
+      if (timeout) {
+        clearTimeout(timeout);
+      }
+      const cb = ( () => f(...args) ).bind(target);
+      timeout = setTimeout(cb, t);
+    }
+  }
+
+  _render ({search, results, context}) {
+    console.log(`search=${search}, context=${context}`);
     const [iconH, iconW, , , iconPath] = faSearch.icon;
-    console.log({iconH, iconW, iconPath});
-    const css=html$1`
+    const css = html$1`
       <style>
         :host {
-          padding: 1rem;
-          font-size: 1.1rem;
         }
         * {
          font-family: 'Gotham A', 'Gotham B', Helvetica Nue, Helvetica, sans-serif; 
+        }
+        div {
+          position: relative;
+          padding: 1rem;
+        }
+        label {
+          position: absolute;
+          left: 1rem;
+          top: -0.1rem;
+          font-size: 0.7rem;
+          color: #999;
         }
         @media not speech {
           .sr-only { display: none }
         }
         input[type="search"] {
+          font-size: 1.1rem;
           padding: 0.3rem;
           border: thin solid #333333;
           border-radius: 0.2rem;
@@ -1909,6 +2130,7 @@ class ByuPersonLookup extends LitElement {
           min-width: 15rem;
         }
         button {
+          font-size: 1.1rem;
           padding: 0.3rem 0.7rem;
           border: thin solid #333333;
           border-radius: 0.2rem;
@@ -1921,7 +2143,11 @@ class ByuPersonLookup extends LitElement {
     return html$1`
     ${css}
     <div>
-      <label class="sr-only" for="search">Search For</label>
+      <label for="search">
+        <slot>
+          No Data Provider
+        </slot>
+      </label>
       <input
         id="search"
         type="search"
@@ -1936,29 +2162,70 @@ class ByuPersonLookup extends LitElement {
         </svg>
       </button>
     </div>
-    <byu-person-lookup-results results="${results}"> </byu-person-lookup-results>
+    <slot name="results">
+      <byu-person-lookup-results
+        results="${results}"
+        context="${context}"
+        on-byu-lookup-results-close="${e => this.closeResults()}"
+      ></byu-person-lookup-results>
+    </slot>
     `
+  }
+
+  closeResults () {
+    this.results = null;
+  }
+
+  registerProvider (provider) {
+    this.__lookupProvider = provider;
+    this.addEventListener('byu-lookup-datasource-result', this.searchResults);
+    this.addEventListener('byu-lookup-datasource-error', this.searchError);
+    this.fetchFromProvider = this.__lookupProvider.performSearch;
+  }
+
+  connectedCallback () {
+    super.connectedCallback();
+    const provider = this.firstElementChild;
+    if (provider && provider.performSearch) {
+      this.registerProvider(provider);
+    } else {
+      const providerErrorFn = () => { throw new Error('No valid lookup provider found!') };
+      const timeout = setTimeout(providerErrorFn, 10000);
+      this.addEventListener('byu-lookup-datasource-register', (e) => {
+        this.registerProvider(e.target);
+        clearTimeout(timeout);
+      });
+    }
+  }
+
+  searchResults (e) {
+    e.stopPropagation(); // Don't trigger any other lookup components
+    console.log('search results:\n', e.detail);
+    this.results = e.detail;
+  }
+
+  searchError (e) {
+    e.stopPropagation(); // Don't trigger any other lookup components
+    console.log('search error:\n', e.detail);
   }
 
   searchChange (e) {
     this.search = e.target.value;
-    console.log(`search=${this.search}`);
+    // console.log(`search=${this.search}`)
+    if (this.__lookupProvider) {
+      const search = this.search;
+      this.__lookupProvider.search = search;
+    }
   }
 
   doSearch () {
     console.log(`doSearch:search: ${this.search}`);
+    this.fetchFromProvider(this.search);
     const s = this.search;
-    this.results = ['', '','','','','','','','','','','','','','','','','','','']
-    .map((v, i) => {
-      return {
-        name: `${s} ${i}`,
-        byuId: (Math.random() * 1000000000).toFixed(0),
-        netId: `${s.substr(0, 4).concat((Math.random() * 100000).toFixed(0).substr(0,2))}`
-      }
-    });
   }
-
 }
 
 console.log('registering person lookup');
 window.customElements.define('byu-person-lookup', ByuPersonLookup);
+
+export default ByuPersonLookup;
