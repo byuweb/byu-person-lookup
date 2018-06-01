@@ -1876,6 +1876,8 @@ class LitElement extends PropertiesMixin(HTMLElement) {
 
 var faSearch = { prefix: 'fas', iconName: 'search', icon: [512, 512, [], "f002", "M505 442.7L405.3 343c-4.5-4.5-10.6-7-17-7H372c27.6-35.3 44-79.7 44-128C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c48.3 0 92.7-16.4 128-44v16.3c0 6.4 2.5 12.5 7 17l99.7 99.7c9.4 9.4 24.6 9.4 33.9 0l28.3-28.3c9.4-9.4 9.4-24.6.1-34zM208 336c-70.7 0-128-57.2-128-128 0-70.7 57.2-128 128-128 70.7 0 128 57.2 128 128 0 70.7-57.2 128-128 128z"] };
 
+var faCircleNotch = { prefix: 'fas', iconName: 'circle-notch', icon: [512, 512, [], "f1ce", "M288 39.056v16.659c0 10.804 7.281 20.159 17.686 23.066C383.204 100.434 440 171.518 440 256c0 101.689-82.295 184-184 184-101.689 0-184-82.295-184-184 0-84.47 56.786-155.564 134.312-177.219C216.719 75.874 224 66.517 224 55.712V39.064c0-15.709-14.834-27.153-30.046-23.234C86.603 43.482 7.394 141.206 8.003 257.332c.72 137.052 111.477 246.956 248.531 246.667C393.255 503.711 504 392.788 504 256c0-115.633-79.14-212.779-186.211-240.236C302.678 11.889 288 23.456 288 39.056z"] };
+
 /*
  * Copyright 2018 Brigham Young University
  *
@@ -2081,25 +2083,15 @@ class ByuPersonLookup extends LitElement {
     return {
       search: String,
       results: Object,
+      searchPending: Boolean,
       context: String
     }
   }
 
-  static debounce (f, t) {
-    // console.log(`debounce::f=${f}, t=${t}`)
-    let timeout;
-    return (...args) => {
-      if (timeout) {
-        clearTimeout(timeout);
-      }
-      const cb = ( () => f(...args) ).bind(target);
-      timeout = setTimeout(cb, t);
-    }
-  }
-
-  _render ({search, results, context}) {
+  _render ({search, results, searchPending, context}) {
     console.log(`search=${search}, context=${context}`);
-    const [iconH, iconW, , , iconPath] = faSearch.icon;
+    const [, , , , searchIconPath] = faSearch.icon;
+    const [, , , , spinIconPath] = faCircleNotch.icon;
     const css = html$1`
       <style>
         :host {
@@ -2137,6 +2129,13 @@ class ByuPersonLookup extends LitElement {
           background-color: #1e61a4;
           color: white;
         }
+        .spin {
+          animation: spin 1500ms linear infinite;
+        }
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
       </style>
     `;
 
@@ -2157,9 +2156,17 @@ class ByuPersonLookup extends LitElement {
         on-search="${e => this.doSearch(e)}"
       >
       <button on-click="${e => this.doSearch(e)}">
-        <svg alt="Search" width="14" height="14" viewBox="0 0 512 512">
-          ${svg$1`<path d$="${iconPath}" fill="white" />`}
+        <svg 
+          class$="${this.searchPending ? 'spin' : ''}"
+          alt="Search" width="14" height="14" viewBox="0 0 512 512">
+          ${svg$1`
+            <path
+              d$="${this.searchPending ? spinIconPath : searchIconPath}"
+              fill="white"
+            />
+          `}
         </svg>
+        ${this.searchPending ? 'Searching' : 'Search'}
       </button>
     </div>
     <slot name="results">
@@ -2192,6 +2199,7 @@ class ByuPersonLookup extends LitElement {
       const providerErrorFn = () => { throw new Error('No valid lookup provider found!') };
       const timeout = setTimeout(providerErrorFn, 10000);
       this.addEventListener('byu-lookup-datasource-register', (e) => {
+        e.stopPropagation();
         this.registerProvider(e.target);
         clearTimeout(timeout);
       });
@@ -2202,6 +2210,7 @@ class ByuPersonLookup extends LitElement {
     e.stopPropagation(); // Don't trigger any other lookup components
     console.log('search results:\n', e.detail);
     this.results = e.detail;
+    this.searchPending = false;
   }
 
   searchError (e) {
@@ -2221,7 +2230,7 @@ class ByuPersonLookup extends LitElement {
   doSearch () {
     console.log(`doSearch:search: ${this.search}`);
     this.fetchFromProvider(this.search);
-    const s = this.search;
+    this.searchPending = true;
   }
 }
 

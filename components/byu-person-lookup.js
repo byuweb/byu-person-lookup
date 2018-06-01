@@ -17,6 +17,7 @@
 import {LitElement, html} from '@polymer/lit-element'
 import {svg} from 'lit-html/lib/lit-extended'
 import faSearch from '@fortawesome/fontawesome-free-solid/faSearch'
+import faCircleNotch from '@fortawesome/fontawesome-free-solid/faCircleNotch'
 import ByuPersonLookupResults from './byu-person-lookup-results'
 
 export default class ByuPersonLookup extends LitElement {
@@ -24,25 +25,15 @@ export default class ByuPersonLookup extends LitElement {
     return {
       search: String,
       results: Object,
+      searchPending: Boolean,
       context: String
     }
   }
 
-  static debounce (f, t) {
-    // console.log(`debounce::f=${f}, t=${t}`)
-    let timeout
-    return (...args) => {
-      if (timeout) {
-        clearTimeout(timeout)
-      }
-      const cb = ( () => f(...args) ).bind(target)
-      timeout = setTimeout(cb, t)
-    }
-  }
-
-  _render ({search, results, context}) {
+  _render ({search, results, searchPending, context}) {
     console.log(`search=${search}, context=${context}`)
-    const [iconH, iconW, , , iconPath] = faSearch.icon
+    const [, , , , searchIconPath] = faSearch.icon
+    const [, , , , spinIconPath] = faCircleNotch.icon
     const css = html`
       <style>
         :host {
@@ -80,6 +71,13 @@ export default class ByuPersonLookup extends LitElement {
           background-color: #1e61a4;
           color: white;
         }
+        .spin {
+          animation: spin 1500ms linear infinite;
+        }
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
       </style>
     `
 
@@ -100,9 +98,17 @@ export default class ByuPersonLookup extends LitElement {
         on-search="${e => this.doSearch(e)}"
       >
       <button on-click="${e => this.doSearch(e)}">
-        <svg alt="Search" width="14" height="14" viewBox="0 0 512 512">
-          ${svg`<path d$="${iconPath}" fill="white" />`}
+        <svg 
+          class$="${this.searchPending ? 'spin' : ''}"
+          alt="Search" width="14" height="14" viewBox="0 0 512 512">
+          ${svg`
+            <path
+              d$="${this.searchPending ? spinIconPath : searchIconPath}"
+              fill="white"
+            />
+          `}
         </svg>
+        ${this.searchPending ? 'Searching' : 'Search'}
       </button>
     </div>
     <slot name="results">
@@ -135,6 +141,7 @@ export default class ByuPersonLookup extends LitElement {
       const providerErrorFn = () => { throw new Error('No valid lookup provider found!') }
       const timeout = setTimeout(providerErrorFn, 10000)
       this.addEventListener('byu-lookup-datasource-register', (e) => {
+        e.stopPropagation()
         this.registerProvider(e.target)
         clearTimeout(timeout)
       })
@@ -145,6 +152,7 @@ export default class ByuPersonLookup extends LitElement {
     e.stopPropagation() // Don't trigger any other lookup components
     console.log('search results:\n', e.detail)
     this.results = e.detail
+    this.searchPending = false
   }
 
   searchError (e) {
@@ -164,7 +172,7 @@ export default class ByuPersonLookup extends LitElement {
   doSearch () {
     console.log(`doSearch:search: ${this.search}`)
     this.fetchFromProvider(this.search)
-    const s = this.search
+    this.searchPending = true
   }
 }
 
