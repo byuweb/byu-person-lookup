@@ -1126,7 +1126,7 @@ function resolveSearchType (search) {
             : { q: `?surname=${search}`, label: 'Name' }
 }
 
-async function search (searchText) {
+async function search (searchText, page) {
   if (!authHeader) {
     throw new Error('Not authenticated!')
   }
@@ -1137,7 +1137,7 @@ async function search (searchText) {
     headers: new window.Headers({ 'Authorization': authHeader })
   };
   const fieldSets = 'basic,addresses,email_addresses,employee_summaries,student_summaries';
-  const response = await window.fetch(`${apiBase}${q}&field_sets=${fieldSets}&page_start=1&page_size=25`, init);
+  const response = await window.fetch(`${apiBase}${q}&field_sets=${fieldSets}&page_start=1&page_size=25`, init); //TODO: Support pagination
   if (response.ok) {
     const json = await response.json();
     return json.values.map(parsePersonV2)

@@ -1861,70 +1861,90 @@ class ByuPersonLookupResults extends LitElement {
   }
 
   _render ({results, context}) {
-    console.log(`results=${Array.isArray(results)}`);
     const css = html$1`
-      <style>
-        :host {
-          padding: 1rem;
-        }
-        * {
-         font-family: 'Gotham A', 'Gotham B', Helvetica Nue, Helvetica, sans-serif; 
-        }
-        .modal {
-          z-index: 98;
-          background-color: rgba(0, 0, 0, 0.6);
-          position: absolute;
-          left: 0;
-          right: 0;
-          top: 0;
-          bottom: 0;
-        }
+    <style>
+      :host {
+        padding: 1rem;
+      }
+      * {
+        font-family: 'Gotham A', 'Gotham B', Helvetica Nue, Helvetica, sans-serif;
+      }
+      .modal {
+        z-index: 98;
+        background-color: rgba(0, 0, 0, 0.6);
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+      }
+      .results {
+        z-index: 99;
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 20vh;
+        bottom: 0;
+        padding: 0.5rem;
+        background-color: white;
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr auto;
+        grid-gap: 0.5rem;
+        overflow: auto;
+      }
+      h2 {
+        margin: 0;
+      }
+      table {
+        border-collapse: collapse;
+      }
+      th, td {
+        padding: 0.5rem;
+        border-bottom: 1px solid #666666;
+      }
+      th {
+        text-align: left;
+        background-color: #0057B8;
+        color: white;
+        padding: 1rem;
+      }
+      tbody tr { cursor: pointer; }
+      tbody tr:nth-child(odd) {
+        background-color: #E6E6E6;
+      }
+      ol, ul {
+        margin: 0;
+        padding: 0;
+      }
+      li {
+        list-style-type: none;
+        margin: 0;
+      }
+      button {
+        font-size: 1.1rem;
+        padding: 0.3rem 1rem;
+        border: thin solid #666666;
+        border-radius: 0.05rem;
+        background-color: #0057B8;
+        color: white;
+        cursor: pointer;
+        justify-self: start;
+        align-self: center;
+      }
+      button:hover, button:active {
+        box-shadow: inset 0 0 0.2rem rgba(255, 255, 255, 0.5);
+        background-color: #5199E1;
+      }
+      @media only screen and (min-width: 900px) {
         .results {
-          z-index: 99;
-          position: absolute;
-          left: 0;
-          right: 0;
-          top: 20vh;
-          bottom: 0;
-          padding: 0.5rem;
-          background-color: white;
-          display: grid;
-          grid-template-columns: 1fr;
-          grid-auto-rows: auto;
-          grid-gap: 0.5rem;
-          overflow-y: auto;
+          left: 10vw;
+          right: 10vw;
+          top: 10vh;
+          max-height: 85vh;
         }
-        table { border-collapse: collapse; }
-        th {
-          text-align: left;
-          background-color: #333333;
-          color: white;
-        }
-        tr { cursor: pointer; }
-        th, td {
-          padding: 0.5rem;
-          border-bottom: 1px solid #333333;
-        }
-        button {
-          font-size: 1.1rem;
-          padding: 0.3rem 0.7rem;
-          border: thin solid #333333;
-          border-radius: 0.2rem;
-          background-color: #1e61a4;
-          color: white;
-          cursor: pointer;
-          justify-self: center;
-          align-self: center;
-        }
-        @media only screen and (min-width: 900px) {
-          .results {
-            left: 10vw;
-            right: 10vw;
-            top: 10vh;
-            max-height: 85vh;
-          }
-        }
-      </style>
+      }
+    </style>
     `;
 
     const renderAddress = address => html$1`
@@ -1989,6 +2009,7 @@ class ByuPersonLookupResults extends LitElement {
       ${css}
       <div class="modal">
         <div class="results">
+          <h2>Lookup Results</h2>
           ${context && context === 'admin' ? renderAdmin(results) : renderDirectory(results)}
           <button on-click="${e => this.close()}">Close</button>
         </div>

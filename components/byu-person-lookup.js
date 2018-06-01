@@ -17,7 +17,7 @@
 import {LitElement, html} from '@polymer/lit-element'
 import {svg} from 'lit-html/lib/lit-extended'
 import faSearch from '@fortawesome/fontawesome-free-solid/faSearch'
-import faCircleNotch from '@fortawesome/fontawesome-free-solid/faCircleNotch'
+import faSpinner from '@fortawesome/fontawesome-free-solid/faSpinner'
 import ByuPersonLookupResults from './byu-person-lookup-results'
 
 export default class ByuPersonLookup extends LitElement {
@@ -33,13 +33,13 @@ export default class ByuPersonLookup extends LitElement {
   _render ({search, results, searchPending, context}) {
     console.log(`search=${search}, context=${context}`)
     const [, , , , searchIconPath] = faSearch.icon
-    const [, , , , spinIconPath] = faCircleNotch.icon
+    const [, , , , spinIconPath] = faSpinner.icon
     const css = html`
       <style>
         :host {
         }
         * {
-         font-family: 'Gotham A', 'Gotham B', Helvetica Nue, Helvetica, sans-serif; 
+         font-family: 'Gotham A', 'Gotham B', Helvetica Nue, Helvetica, sans-serif;
         }
         div {
           position: relative;
@@ -58,18 +58,23 @@ export default class ByuPersonLookup extends LitElement {
         input[type="search"] {
           font-size: 1.1rem;
           padding: 0.3rem;
-          border: thin solid #333333;
+          border: thin solid #666666;
           border-radius: 0.2rem;
           margin-right: 0.2rem;
           min-width: 15rem;
         }
         button {
           font-size: 1.1rem;
-          padding: 0.3rem 0.7rem;
-          border: thin solid #333333;
-          border-radius: 0.2rem;
-          background-color: #1e61a4;
+          padding: 0.3rem 1rem;
+          border: thin solid #666666;
+          border-radius: 0.05rem;
+          background-color: #0057B8;
           color: white;
+          cursor: pointer;
+        }
+        button:hover, button:active {
+          box-shadow: inset 0 0 0.2rem rgba(255, 255, 255, 0.5);
+          background-color: #5199E1;
         }
         .spin {
           animation: spin 1500ms linear infinite;
@@ -98,7 +103,7 @@ export default class ByuPersonLookup extends LitElement {
         on-search="${e => this.doSearch(e)}"
       >
       <button on-click="${e => this.doSearch(e)}">
-        <svg 
+        <svg
           class$="${this.searchPending ? 'spin' : ''}"
           alt="Search" width="14" height="14" viewBox="0 0 512 512">
           ${svg`

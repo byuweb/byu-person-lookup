@@ -1876,7 +1876,7 @@ class LitElement extends PropertiesMixin(HTMLElement) {
 
 var faSearch = { prefix: 'fas', iconName: 'search', icon: [512, 512, [], "f002", "M505 442.7L405.3 343c-4.5-4.5-10.6-7-17-7H372c27.6-35.3 44-79.7 44-128C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c48.3 0 92.7-16.4 128-44v16.3c0 6.4 2.5 12.5 7 17l99.7 99.7c9.4 9.4 24.6 9.4 33.9 0l28.3-28.3c9.4-9.4 9.4-24.6.1-34zM208 336c-70.7 0-128-57.2-128-128 0-70.7 57.2-128 128-128 70.7 0 128 57.2 128 128 0 70.7-57.2 128-128 128z"] };
 
-var faCircleNotch = { prefix: 'fas', iconName: 'circle-notch', icon: [512, 512, [], "f1ce", "M288 39.056v16.659c0 10.804 7.281 20.159 17.686 23.066C383.204 100.434 440 171.518 440 256c0 101.689-82.295 184-184 184-101.689 0-184-82.295-184-184 0-84.47 56.786-155.564 134.312-177.219C216.719 75.874 224 66.517 224 55.712V39.064c0-15.709-14.834-27.153-30.046-23.234C86.603 43.482 7.394 141.206 8.003 257.332c.72 137.052 111.477 246.956 248.531 246.667C393.255 503.711 504 392.788 504 256c0-115.633-79.14-212.779-186.211-240.236C302.678 11.889 288 23.456 288 39.056z"] };
+var faSpinner = { prefix: 'fas', iconName: 'spinner', icon: [512, 512, [], "f110", "M304 48c0 26.51-21.49 48-48 48s-48-21.49-48-48 21.49-48 48-48 48 21.49 48 48zm-48 368c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zm208-208c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zM96 256c0-26.51-21.49-48-48-48S0 229.49 0 256s21.49 48 48 48 48-21.49 48-48zm12.922 99.078c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.491-48-48-48zm294.156 0c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.49-48-48-48zM108.922 60.922c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.491-48-48-48z"] };
 
 /*
  * Copyright 2018 Brigham Young University
@@ -1903,70 +1903,90 @@ class ByuPersonLookupResults extends LitElement {
   }
 
   _render ({results, context}) {
-    console.log(`results=${Array.isArray(results)}`);
     const css = html$1`
-      <style>
-        :host {
-          padding: 1rem;
-        }
-        * {
-         font-family: 'Gotham A', 'Gotham B', Helvetica Nue, Helvetica, sans-serif; 
-        }
-        .modal {
-          z-index: 98;
-          background-color: rgba(0, 0, 0, 0.6);
-          position: absolute;
-          left: 0;
-          right: 0;
-          top: 0;
-          bottom: 0;
-        }
+    <style>
+      :host {
+        padding: 1rem;
+      }
+      * {
+        font-family: 'Gotham A', 'Gotham B', Helvetica Nue, Helvetica, sans-serif;
+      }
+      .modal {
+        z-index: 98;
+        background-color: rgba(0, 0, 0, 0.6);
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+      }
+      .results {
+        z-index: 99;
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 20vh;
+        bottom: 0;
+        padding: 0.5rem;
+        background-color: white;
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr auto;
+        grid-gap: 0.5rem;
+        overflow: auto;
+      }
+      h2 {
+        margin: 0;
+      }
+      table {
+        border-collapse: collapse;
+      }
+      th, td {
+        padding: 0.5rem;
+        border-bottom: 1px solid #666666;
+      }
+      th {
+        text-align: left;
+        background-color: #0057B8;
+        color: white;
+        padding: 1rem;
+      }
+      tbody tr { cursor: pointer; }
+      tbody tr:nth-child(odd) {
+        background-color: #E6E6E6;
+      }
+      ol, ul {
+        margin: 0;
+        padding: 0;
+      }
+      li {
+        list-style-type: none;
+        margin: 0;
+      }
+      button {
+        font-size: 1.1rem;
+        padding: 0.3rem 1rem;
+        border: thin solid #666666;
+        border-radius: 0.05rem;
+        background-color: #0057B8;
+        color: white;
+        cursor: pointer;
+        justify-self: start;
+        align-self: center;
+      }
+      button:hover, button:active {
+        box-shadow: inset 0 0 0.2rem rgba(255, 255, 255, 0.5);
+        background-color: #5199E1;
+      }
+      @media only screen and (min-width: 900px) {
         .results {
-          z-index: 99;
-          position: absolute;
-          left: 0;
-          right: 0;
-          top: 20vh;
-          bottom: 0;
-          padding: 0.5rem;
-          background-color: white;
-          display: grid;
-          grid-template-columns: 1fr;
-          grid-auto-rows: auto;
-          grid-gap: 0.5rem;
-          overflow-y: auto;
+          left: 10vw;
+          right: 10vw;
+          top: 10vh;
+          max-height: 85vh;
         }
-        table { border-collapse: collapse; }
-        th {
-          text-align: left;
-          background-color: #333333;
-          color: white;
-        }
-        tr { cursor: pointer; }
-        th, td {
-          padding: 0.5rem;
-          border-bottom: 1px solid #333333;
-        }
-        button {
-          font-size: 1.1rem;
-          padding: 0.3rem 0.7rem;
-          border: thin solid #333333;
-          border-radius: 0.2rem;
-          background-color: #1e61a4;
-          color: white;
-          cursor: pointer;
-          justify-self: center;
-          align-self: center;
-        }
-        @media only screen and (min-width: 900px) {
-          .results {
-            left: 10vw;
-            right: 10vw;
-            top: 10vh;
-            max-height: 85vh;
-          }
-        }
-      </style>
+      }
+    </style>
     `;
 
     const renderAddress = address => html$1`
@@ -2031,6 +2051,7 @@ class ByuPersonLookupResults extends LitElement {
       ${css}
       <div class="modal">
         <div class="results">
+          <h2>Lookup Results</h2>
           ${context && context === 'admin' ? renderAdmin(results) : renderDirectory(results)}
           <button on-click="${e => this.close()}">Close</button>
         </div>
@@ -2091,13 +2112,13 @@ class ByuPersonLookup extends LitElement {
   _render ({search, results, searchPending, context}) {
     console.log(`search=${search}, context=${context}`);
     const [, , , , searchIconPath] = faSearch.icon;
-    const [, , , , spinIconPath] = faCircleNotch.icon;
+    const [, , , , spinIconPath] = faSpinner.icon;
     const css = html$1`
       <style>
         :host {
         }
         * {
-         font-family: 'Gotham A', 'Gotham B', Helvetica Nue, Helvetica, sans-serif; 
+         font-family: 'Gotham A', 'Gotham B', Helvetica Nue, Helvetica, sans-serif;
         }
         div {
           position: relative;
@@ -2116,18 +2137,23 @@ class ByuPersonLookup extends LitElement {
         input[type="search"] {
           font-size: 1.1rem;
           padding: 0.3rem;
-          border: thin solid #333333;
+          border: thin solid #666666;
           border-radius: 0.2rem;
           margin-right: 0.2rem;
           min-width: 15rem;
         }
         button {
           font-size: 1.1rem;
-          padding: 0.3rem 0.7rem;
-          border: thin solid #333333;
-          border-radius: 0.2rem;
-          background-color: #1e61a4;
+          padding: 0.3rem 1rem;
+          border: thin solid #666666;
+          border-radius: 0.05rem;
+          background-color: #0057B8;
           color: white;
+          cursor: pointer;
+        }
+        button:hover, button:active {
+          box-shadow: inset 0 0 0.2rem rgba(255, 255, 255, 0.5);
+          background-color: #5199E1;
         }
         .spin {
           animation: spin 1500ms linear infinite;
@@ -2156,7 +2182,7 @@ class ByuPersonLookup extends LitElement {
         on-search="${e => this.doSearch(e)}"
       >
       <button on-click="${e => this.doSearch(e)}">
-        <svg 
+        <svg
           class$="${this.searchPending ? 'spin' : ''}"
           alt="Search" width="14" height="14" viewBox="0 0 512 512">
           ${svg$1`
