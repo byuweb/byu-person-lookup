@@ -1878,6 +1878,14 @@ var faSearch = { prefix: 'fas', iconName: 'search', icon: [512, 512, [], "f002",
 
 var faSpinner = { prefix: 'fas', iconName: 'spinner', icon: [512, 512, [], "f110", "M304 48c0 26.51-21.49 48-48 48s-48-21.49-48-48 21.49-48 48-48 48 21.49 48 48zm-48 368c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zm208-208c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zM96 256c0-26.51-21.49-48-48-48S0 229.49 0 256s21.49 48 48 48 48-21.49 48-48zm12.922 99.078c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.491-48-48-48zm294.156 0c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.49-48-48-48zM108.922 60.922c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.491-48-48-48z"] };
 
+var faTimes = { prefix: 'fas', iconName: 'times', icon: [352, 512, [], "f00d", "M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"] };
+
+var faEnvelope = { prefix: 'fas', iconName: 'envelope', icon: [512, 512, [], "f0e0", "M502.3 190.8c3.9-3.1 9.7-.2 9.7 4.7V400c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V195.6c0-5 5.7-7.8 9.7-4.7 22.4 17.4 52.1 39.5 154.1 113.6 21.1 15.4 56.7 47.8 92.2 47.6 35.7.3 72-32.8 92.3-47.6 102-74.1 131.6-96.3 154-113.7zM256 320c23.2.4 56.6-29.2 73.4-41.4 132.7-96.3 142.8-104.7 173.4-128.7 5.8-4.5 9.2-11.5 9.2-18.9v-19c0-26.5-21.5-48-48-48H48C21.5 64 0 85.5 0 112v19c0 7.4 3.4 14.3 9.2 18.9 30.6 23.9 40.7 32.4 173.4 128.7 16.8 12.2 50.2 41.8 73.4 41.4z"] };
+
+var faPhone = { prefix: 'fas', iconName: 'phone', icon: [512, 512, [], "f095", "M493.4 24.6l-104-24c-11.3-2.6-22.9 3.3-27.5 13.9l-48 112c-4.2 9.8-1.4 21.3 6.9 28l60.6 49.6c-36 76.7-98.9 140.5-177.2 177.2l-49.6-60.6c-6.8-8.3-18.2-11.1-28-6.9l-112 48C3.9 366.5-2 378.1.6 389.4l24 104C27.1 504.2 36.7 512 48 512c256.1 0 464-207.5 464-464 0-11.2-7.7-20.9-18.6-23.4z"] };
+
+var faHome = { prefix: 'fas', iconName: 'home', icon: [576, 512, [], "f015", "M488 312.7V456c0 13.3-10.7 24-24 24H348c-6.6 0-12-5.4-12-12V356c0-6.6-5.4-12-12-12h-72c-6.6 0-12 5.4-12 12v112c0 6.6-5.4 12-12 12H112c-13.3 0-24-10.7-24-24V312.7c0-3.6 1.6-7 4.4-9.3l188-154.8c4.4-3.6 10.8-3.6 15.3 0l188 154.8c2.7 2.3 4.3 5.7 4.3 9.3zm83.6-60.9L488 182.9V44.4c0-6.6-5.4-12-12-12h-56c-6.6 0-12 5.4-12 12V117l-89.5-73.7c-17.7-14.6-43.3-14.6-61 0L4.4 251.8c-5.1 4.2-5.8 11.8-1.6 16.9l25.5 31c4.2 5.1 11.8 5.8 16.9 1.6l235.2-193.7c4.4-3.6 10.8-3.6 15.3 0l235.2 193.7c5.1 4.2 12.7 3.5 16.9-1.6l25.5-31c4.2-5.2 3.4-12.7-1.7-16.9z"] };
+
 /*
  * Copyright 2018 Brigham Young University
  *
@@ -1904,90 +1912,142 @@ class ByuPersonLookupResults extends LitElement {
 
   _render ({results, context}) {
     const css = html$1`
-    <style>
-      :host {
-        padding: 1rem;
-      }
-      * {
-        font-family: 'Gotham A', 'Gotham B', Helvetica Nue, Helvetica, sans-serif;
-      }
-      .modal {
-        z-index: 98;
-        background-color: rgba(0, 0, 0, 0.6);
-        position: absolute;
-        left: 0;
-        right: 0;
-        top: 0;
-        bottom: 0;
-      }
-      .results {
-        z-index: 99;
-        position: absolute;
-        left: 0;
-        right: 0;
-        top: 20vh;
-        bottom: 0;
-        padding: 0.5rem;
-        background-color: white;
-        display: grid;
-        grid-template-columns: 1fr;
-        grid-template-rows: auto 1fr auto;
-        grid-gap: 0.5rem;
-        overflow: auto;
-      }
-      h2 {
-        margin: 0;
-      }
-      table {
-        border-collapse: collapse;
-      }
-      th, td {
-        padding: 0.5rem;
-        border-bottom: 1px solid #666666;
-      }
-      th {
-        text-align: left;
-        background-color: #0057B8;
-        color: white;
-        padding: 1rem;
-      }
-      tbody tr { cursor: pointer; }
-      tbody tr:nth-child(odd) {
-        background-color: #E6E6E6;
-      }
-      ol, ul {
-        margin: 0;
-        padding: 0;
-      }
-      li {
-        list-style-type: none;
-        margin: 0;
-      }
-      button {
-        font-size: 1.1rem;
-        padding: 0.3rem 1rem;
-        border: thin solid #666666;
-        border-radius: 0.05rem;
-        background-color: #0057B8;
-        color: white;
-        cursor: pointer;
-        justify-self: start;
-        align-self: center;
-      }
-      button:hover, button:active {
-        box-shadow: inset 0 0 0.2rem rgba(255, 255, 255, 0.5);
-        background-color: #5199E1;
-      }
-      @media only screen and (min-width: 900px) {
-        .results {
-          left: 10vw;
-          right: 10vw;
-          top: 10vh;
-          max-height: 85vh;
+      <style>
+        :host {
+          padding: 1rem;
         }
+    * {
+      font-family: 'Gotham A', 'Gotham B', Helvetica Nue, Helvetica, sans-serif;
+    }
+    .modal {
+      z-index: 98;
+      background-color: rgba(0, 0, 0, 0.6);
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 0;
+    }
+    .results {
+      z-index: 99;
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 20vh;
+      bottom: 0;
+      padding: 0.5rem;
+      background-color: white;
+      display: grid;
+      grid-template-columns: 1fr;
+      grid-template-rows: auto 1fr auto;
+      grid-gap: 0.5rem;
+      overflow: auto;
+    }
+    .close-modal {
+      z-index: 100;
+      position: absolute;
+      right: 0;
+      top: calc(20vh - 2rem);
+      border-radius: 50%;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      padding: 0.3rem;
+      border: 1px solid #5199E1;
+      cursor: pointer;
+      box-shadow: 0rem 0rem 1rem #5199E1;
+    }
+    h2 {
+      margin: 0;
+    }
+    table {
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 0.5rem;
+      border-bottom: 1px solid #666666;
+    }
+    th {
+      text-align: left;
+      background-color: #0057B8;
+      color: white;
+      padding: 1rem;
+    }
+    tbody tr { cursor: pointer; }
+    tbody tr:nth-child(odd) {
+      background-color: #E6E6E6;
+    }
+    ol, ul {
+      margin: 0;
+      padding: 0;
+      display: inline-flex;
+      flex-direction: column;
+    }
+    li {
+      list-style-type: none;
+      margin: 0;
+    }
+    .close-button {
+      padding: 0.3rem 1rem;
+      border: thin solid #666666;
+      border-radius: 0.05rem;
+      color: white;
+      cursor: pointer;
+      justify-self: start;
+      align-self: center;
+    }
+    button {
+      font-size: 1.1rem;
+      background-color: #0057B8;
+    }
+    button:hover, button:active {
+      box-shadow: inset 0 0 0.2rem rgba(255, 255, 255, 0.5);
+      background-color: #5199E1;
+    }
+    .deck {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(28rem, 1fr));
+      grid-auto-rows: auto;
+      grid-gap: 1rem;
+    }
+    .card {
+      border: thin solid #666666;
+      border-left: thick solid #002E5D;
+      padding: 0.5rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto auto;
+      grid-gap: 0.5rem;
+    }
+    .card h3 {
+      grid-column: 1/3;
+    }
+    .contact {
+      display: flex;
+      flex-direction: column;
+    }
+    .contact div {
+      display: inline-grid;
+      grid-template-columns: auto 1fr;
+      grid-gap: 0.25rem;
+    }
+    .contact div svg {
+      margin-top: calc(1rem - 14px);
+    }
+    @media only screen and (min-width: 900px) {
+      .results {
+        left: 10vw;
+        right: 10vw;
+        top: 10vh;
+        max-height: 85vh;
       }
-    </style>
-    `;
+      .close-modal {
+        right: calc(10vw - 2rem);
+        top: calc(10vh - 2rem);
+      }
+    }
+  </style>
+`;
 
     const renderAddress = address => html$1`
       <ul>
@@ -2004,13 +2064,38 @@ class ByuPersonLookupResults extends LitElement {
       </tr>
     `;
 
-    // TODO: address type hierarchy?
-    const renderDirectoryRow = row => html$1`
-      <tr on-click="${e => this.select(row)}">
-        <td>${row.name}</td>
-        <td>${row.addresses.mailing ? renderAddress(row.addresses.mailing) : ''}</td>
-        <td>${row.email}</td>
-      </tr>
+    const renderEmployeeInfo = row => {
+      if (/ACT/.test(row.employeeType)) {
+        return html$1`
+          <div>
+            <div>${row.jobTitle}</div>
+            <div>${row.department}</div>
+            <div>${row.addresses.work ? renderAddress(row.addresses.work) : ''}</div>
+          </div>
+        `
+      }
+      return html$1`<div></div>`
+    };
+
+    const [, , , , envelopeIconPath] = faEnvelope.icon;
+    const [, , , , phoneIconPath] = faPhone.icon;
+    const [, , , , homeIconPath] = faHome.icon;
+    const renderIcon = path => html$1`
+      <svg width="14" height="14" viewBox="0 0 512 512">
+        ${svg$1`<path d$="${path}" fill="#666666"/>`}
+      </svg>
+    `;
+
+    const renderDirectoryCard = row => html$1`
+      <div class="card" on-click="${e => this.select(row)}">
+        <h3>${row.name}</h3>
+        ${renderEmployeeInfo(row)}
+        <div class="contact">
+          <div>${renderIcon(envelopeIconPath)}${row.email}</div>
+          <div>${renderIcon(phoneIconPath)}${row.phone}</div>
+          <div>${renderIcon(homeIconPath)}${row.addresses.mailing ? renderAddress(row.addresses.mailing) : ''}</div>
+        </div>
+      </div>
     `;
 
     const renderAdmin = results => html$1`
@@ -2031,31 +2116,33 @@ class ByuPersonLookupResults extends LitElement {
     `;
 
     const renderDirectory = results => html$1`
-      <table>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Address</th>
-            <th>Email</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${results && results.map ? results.map(r => renderDirectoryRow(r)) : ''}
-        </tbody>
-      </table>
+      <div class="deck">
+        ${results && results.map ? results.map(r => renderDirectoryCard(r)) : ''}
+      </div>
     `;
 
     if (!results || results.length < 1) {
       return html$1``
     }
+
+    const [, , , , closeIconPath] = faTimes.icon;
+    const closeIcon = svg$1`
+    <path d$=${closeIconPath} fill="white" transform="translate(90)"/>
+    `;
+
     return html$1`
       ${css}
       <div class="modal">
         <div class="results">
           <h2>Lookup Results</h2>
           ${context && context === 'admin' ? renderAdmin(results) : renderDirectory(results)}
-          <button on-click="${e => this.close()}">Close</button>
+          <button class="close-button" on-click="${e => this.close()}">Close</button>
         </div>
+        <button class="close-modal" on-click="${e => this.close()}">
+          <svg alt="Search" width="24" height="24" viewBox="0 0 512 512">
+            ${closeIcon}
+          </svg>
+        </button>
       </div>
     `
   }

@@ -1039,6 +1039,15 @@ function parseEmailAddresses (emailAddresses) {
     .reduce(pickFirst, '')
 }
 
+function parsePhones (phones) {
+  if (phones.metadata.validation_response.code !== 200) {
+    return null
+  }
+  return phones.values.map(p => lodash_get(p, 'phone_number.value', ''))
+  .filter(p => !!p)
+  .reduce(pickFirst, '')
+}
+
 function parseEmployeeSummaries (employeeSummaries) {
   if (employeeSummaries.metadata.validation_response.code !== 200) {
     return null
@@ -1061,11 +1070,12 @@ function parseStudentSummaries (studentSummaries) {
 function parsePersonV2 (data) {
   return Object.assign({
     addresses: parseAddresses(data.addresses),
-    email: parseEmailAddresses(data.email_addresses)
+    email: parseEmailAddresses(data.email_addresses),
+    phone: parsePhones(data.phones)
   },
   parseBasic(data.basic),
   parseEmployeeSummaries(data.employee_summaries),
-  parseStudentSummaries(data.student_summaries)
+  parseStudentSummaries(data.student_summaries),
   )
 }
 
@@ -1136,7 +1146,7 @@ async function search (searchText, page) {
     method: 'GET',
     headers: new window.Headers({ 'Authorization': authHeader })
   };
-  const fieldSets = 'basic,addresses,email_addresses,employee_summaries,student_summaries';
+  const fieldSets = 'basic,addresses,email_addresses,phones,employee_summaries,student_summaries';
   const response = await window.fetch(`${apiBase}${q}&field_sets=${fieldSets}&page_start=1&page_size=25`, init); //TODO: Support pagination
   if (response.ok) {
     const json = await response.json();

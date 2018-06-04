@@ -59,6 +59,15 @@ function parseEmailAddresses (emailAddresses) {
     .reduce(pickFirst, '')
 }
 
+function parsePhones (phones) {
+  if (phones.metadata.validation_response.code !== 200) {
+    return null
+  }
+  return phones.values.map(p => get(p, 'phone_number.value', ''))
+  .filter(p => !!p)
+  .reduce(pickFirst, '')
+}
+
 function parseEmployeeSummaries (employeeSummaries) {
   if (employeeSummaries.metadata.validation_response.code !== 200) {
     return null
@@ -81,10 +90,11 @@ function parseStudentSummaries (studentSummaries) {
 export default function (data) {
   return Object.assign({
     addresses: parseAddresses(data.addresses),
-    email: parseEmailAddresses(data.email_addresses)
+    email: parseEmailAddresses(data.email_addresses),
+    phone: parsePhones(data.phones)
   },
   parseBasic(data.basic),
   parseEmployeeSummaries(data.employee_summaries),
-  parseStudentSummaries(data.student_summaries)
+  parseStudentSummaries(data.student_summaries),
   )
 }

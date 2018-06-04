@@ -6,9 +6,9 @@
   version "0.3.1"
   resolved "https://registry.yarnpkg.com/@byuweb/browser-oauth/-/browser-oauth-0.3.1.tgz#9c708017a19b81518b8ac22034b2277b4a918236"
 
-"@byuweb/byu-web-component-build@^1.3.0":
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/@byuweb/byu-web-component-build/-/byu-web-component-build-1.3.0.tgz#12bd6cdaaf0e2857731acdab2aaf4d71af033d60"
+"@byuweb/byu-web-component-build@^1.3.1":
+  version "1.3.1"
+  resolved "https://registry.yarnpkg.com/@byuweb/byu-web-component-build/-/byu-web-component-build-1.3.1.tgz#a3ca04d8210e1790413c2ef1af5d9412ab0a2184"
   dependencies:
     app-root-path "^2.0.1"
     babel-preset-env "^1.1.11"

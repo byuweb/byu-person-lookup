@@ -68,7 +68,7 @@ export async function search (searchText, page) {
     method: 'GET',
     headers: new window.Headers({ 'Authorization': authHeader })
   }
-  const fieldSets = 'basic,addresses,email_addresses,employee_summaries,student_summaries'
+  const fieldSets = 'basic,addresses,email_addresses,phones,employee_summaries,student_summaries'
   const response = await window.fetch(`${apiBase}${q}&field_sets=${fieldSets}&page_start=1&page_size=25`, init) //TODO: Support pagination
   if (response.ok) {
     const json = await response.json()

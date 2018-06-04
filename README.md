@@ -34,8 +34,7 @@ Include the component somewhere in your page, providing the data source componen
 
 ## Configure the component
 The BYU Person Lookup component includes an optional `context` attribute that controls how the list
-of matching people is displayed. Valid values are `directory` (the default) which will display Name, Address, and
-Email, and `admin` which displays Name, BYU ID, Net ID, Employee Type, and Student Status.
+of matching people is displayed. Valid values are `directory` (the default) which will display contact information, and `admin` which displays identifiers and student and employee statuses.
 ```html
 <byu-person-lookup id="myLookup" context="admin">
     <byu-personsv2-datasource></byu-personsv2-datasource>
@@ -77,6 +76,7 @@ certain events:
       residential: [/*address lines*/]
     },
     email: '',
+    phone: '',
     name: '',
     byuId: '',
     netId: '',
