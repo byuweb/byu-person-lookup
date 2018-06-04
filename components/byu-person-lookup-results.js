@@ -126,6 +126,7 @@ export default class ByuPersonLookupResults extends LitElement {
       </tr>
     `
 
+    // TODO: address type hierarchy?
     const renderDirectoryRow = row => html`
       <tr on-click="${e => this.select(row)}">
         <td>${row.name}</td>

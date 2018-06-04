@@ -1,10 +1,6 @@
 name: BYU Person Lookup
-description: Lookup a person
 resources:
     - src: dist/**
       dest: ./
-entrypoints:
-  byu-person-lookup.js: ''
-  byu-person-lookup.min.js: ''
 docs:
   https://github.com/byuweb/byu-person-lookup/blob/master/README.md          
