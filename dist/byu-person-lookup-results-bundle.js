@@ -2008,7 +2008,7 @@ class ByuPersonLookupResults extends LitElement {
     }
     .card {
       border: thin solid #666666;
-      border-left: thick solid #002E5D;
+      border-left: 0.5rem solid #002E5D;
       padding: 0.5rem;
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -2016,6 +2016,7 @@ class ByuPersonLookupResults extends LitElement {
       grid-gap: 0.5rem;
     }
     .card h3 {
+      margin: 0;
       grid-column: 1/3;
     }
     .contact {
