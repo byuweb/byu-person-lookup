@@ -13,8 +13,8 @@ To use this component, your website needs to do 3 things:
 ### Import the components
 First, import the `byu-person-lookup` component from the BYU CDN:
 ```html
-<script type="module" src="https://cdn.byu.edu/byu-person-lookup/byu-person-lookup-bundle.min.js"></script>
-<script type="module" src="https://cdn.byu.edu/byu-person-lookup/byu-personsv2-datasource-bundle.min.js"></script>
+<script type="module" src="https://cdn.byu.edu/byu-person-lookup/latest/byu-person-lookup-bundle.min.js"></script>
+<script type="module" src="https://cdn.byu.edu/byu-person-lookup/latest/byu-personsv2-datasource-bundle.min.js"></script>
 ```
 
 ### Include a BYU Browser Oauth Implementation
