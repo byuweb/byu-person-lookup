@@ -137,6 +137,7 @@ export default class ByuPersonLookupResults extends LitElement {
       grid-template-columns: 1fr 1fr;
       grid-template-rows: auto auto;
       grid-gap: 0.5rem;
+      cursor: pointer;
     }
     .card h3 {
       margin: 0;
