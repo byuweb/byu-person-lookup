@@ -1939,7 +1939,7 @@ class ByuPersonLookupResults extends LitElement {
       background-color: white;
       display: grid;
       grid-template-columns: 1fr;
-      grid-template-rows: auto 1fr auto;
+      grid-template-rows: auto auto 1fr auto;
       grid-gap: 0.5rem;
       overflow: auto;
     }
@@ -2006,7 +2006,7 @@ class ByuPersonLookupResults extends LitElement {
     }
     .deck {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(28rem, 1fr));
+      grid-template-columns: 1fr;
       grid-auto-rows: auto;
       grid-gap: 1rem;
     }
@@ -2015,14 +2015,13 @@ class ByuPersonLookupResults extends LitElement {
       border-left: 0.5rem solid #002E5D;
       padding: 0.5rem;
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      grid-template-rows: auto auto;
+      grid-template-columns: 1fr;
+      grid-auto-rows: auto;
       grid-gap: 0.5rem;
       cursor: pointer;
     }
     .card h3 {
       margin: 0;
-      grid-column: 1/3;
     }
     .contact {
       display: flex;
@@ -2035,6 +2034,28 @@ class ByuPersonLookupResults extends LitElement {
     }
     .contact div svg {
       margin-top: calc(1rem - 14px);
+    }
+    @media only screen and (min-width: 650px) {
+      .deck {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(28rem, 1fr));
+        grid-auto-rows: auto;
+        grid-gap: 1rem;
+      }
+      .card {
+        border: thin solid #666666;
+        border-left: 0.5rem solid #002E5D;
+        padding: 0.5rem;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto auto;
+        grid-gap: 0.5rem;
+        cursor: pointer;
+      }
+      .card h3 {
+        margin: 0;
+        grid-column: 1/3;
+      }
     }
     @media only screen and (min-width: 900px) {
       .results {
@@ -2138,6 +2159,7 @@ class ByuPersonLookupResults extends LitElement {
         <div class="results">
           <h2>Lookup Results</h2>
           ${context && context === 'admin' ? renderAdmin(results) : renderDirectory(results)}
+          <div class="spacer"></div>
           <button class="close-button" on-click="${e => this.close()}">Close</button>
         </div>
         <button class="close-modal" on-click="${e => this.close()}">
@@ -2221,9 +2243,6 @@ class ByuPersonLookup extends LitElement {
           font-size: 0.7rem;
           color: #999;
         }
-        @media not speech {
-          .sr-only { display: none }
-        }
         input[type="search"] {
           font-size: 1.1rem;
           padding: 0.3rem;
@@ -2251,6 +2270,17 @@ class ByuPersonLookup extends LitElement {
         @keyframes spin {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
+        }
+        .search-btn-label {
+          display: none;
+        }
+        @media not speech {
+          .sr-only { display: none; }
+        }
+        @media only screen and (min-width: 470px) {
+          .search-btn-label {
+            display: inline-block;
+          }
         }
       </style>
     `;
@@ -2282,7 +2312,9 @@ class ByuPersonLookup extends LitElement {
             />
           `}
         </svg>
-        ${this.searchPending ? 'Searching' : 'Search'}
+        <span class="search-btn-label">
+          ${this.searchPending ? 'Searching' : 'Search'}
+        </span>
       </button>
     </div>
     <slot name="results">

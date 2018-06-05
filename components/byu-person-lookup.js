@@ -52,9 +52,6 @@ export default class ByuPersonLookup extends LitElement {
           font-size: 0.7rem;
           color: #999;
         }
-        @media not speech {
-          .sr-only { display: none }
-        }
         input[type="search"] {
           font-size: 1.1rem;
           padding: 0.3rem;
@@ -82,6 +79,17 @@ export default class ByuPersonLookup extends LitElement {
         @keyframes spin {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
+        }
+        .search-btn-label {
+          display: none;
+        }
+        @media not speech {
+          .sr-only { display: none; }
+        }
+        @media only screen and (min-width: 470px) {
+          .search-btn-label {
+            display: inline-block;
+          }
         }
       </style>
     `
@@ -113,7 +121,9 @@ export default class ByuPersonLookup extends LitElement {
             />
           `}
         </svg>
-        ${this.searchPending ? 'Searching' : 'Search'}
+        <span class="search-btn-label">
+          ${this.searchPending ? 'Searching' : 'Search'}
+        </span>
       </button>
     </div>
     <slot name="results">

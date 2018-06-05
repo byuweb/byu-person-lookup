@@ -58,7 +58,7 @@ export default class ByuPersonLookupResults extends LitElement {
       background-color: white;
       display: grid;
       grid-template-columns: 1fr;
-      grid-template-rows: auto 1fr auto;
+      grid-template-rows: auto auto 1fr auto;
       grid-gap: 0.5rem;
       overflow: auto;
     }
@@ -125,7 +125,7 @@ export default class ByuPersonLookupResults extends LitElement {
     }
     .deck {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(28rem, 1fr));
+      grid-template-columns: 1fr;
       grid-auto-rows: auto;
       grid-gap: 1rem;
     }
@@ -134,14 +134,13 @@ export default class ByuPersonLookupResults extends LitElement {
       border-left: 0.5rem solid #002E5D;
       padding: 0.5rem;
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      grid-template-rows: auto auto;
+      grid-template-columns: 1fr;
+      grid-auto-rows: auto;
       grid-gap: 0.5rem;
       cursor: pointer;
     }
     .card h3 {
       margin: 0;
-      grid-column: 1/3;
     }
     .contact {
       display: flex;
@@ -154,6 +153,28 @@ export default class ByuPersonLookupResults extends LitElement {
     }
     .contact div svg {
       margin-top: calc(1rem - 14px);
+    }
+    @media only screen and (min-width: 650px) {
+      .deck {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(28rem, 1fr));
+        grid-auto-rows: auto;
+        grid-gap: 1rem;
+      }
+      .card {
+        border: thin solid #666666;
+        border-left: 0.5rem solid #002E5D;
+        padding: 0.5rem;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto auto;
+        grid-gap: 0.5rem;
+        cursor: pointer;
+      }
+      .card h3 {
+        margin: 0;
+        grid-column: 1/3;
+      }
     }
     @media only screen and (min-width: 900px) {
       .results {
@@ -257,6 +278,7 @@ export default class ByuPersonLookupResults extends LitElement {
         <div class="results">
           <h2>Lookup Results</h2>
           ${context && context === 'admin' ? renderAdmin(results) : renderDirectory(results)}
+          <div class="spacer"></div>
           <button class="close-button" on-click="${e => this.close()}">Close</button>
         </div>
         <button class="close-modal" on-click="${e => this.close()}">
