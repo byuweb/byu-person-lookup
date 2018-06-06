@@ -998,6 +998,12 @@ var lodash_get = get;
 
 const pickFirst = (acc, curr) => acc || curr;
 
+function parseLinks(links) {
+  const next = lodash_get(links, 'persons__next.href');
+  const prev = lodash_get(links, 'persons__prev.href');
+  return {next, prev}
+}
+
 function parseAddresses (addresses) {
   if (addresses.metadata.validation_response.code !== 200) {
     return null
@@ -1067,7 +1073,7 @@ function parseStudentSummaries (studentSummaries) {
   return { studentStatus }
 }
 
-function parsePersonV2 (data) {
+function parsePerson (data) {
   return Object.assign({
     addresses: parseAddresses(data.addresses),
     email: parseEmailAddresses(data.email_addresses),
@@ -1077,6 +1083,12 @@ function parsePersonV2 (data) {
   parseEmployeeSummaries(data.employee_summaries),
   parseStudentSummaries(data.student_summaries),
   )
+}
+
+function parsePersonV2 (data) {
+  const people = data.values.map(parsePerson);
+  const {next, prev} = parseLinks(data.links);
+  return {next, prev, people}
 }
 
 /*
@@ -1136,21 +1148,31 @@ function resolveSearchType (search) {
             : { q: `?surname=${search}`, label: 'Name' }
 }
 
-async function search (searchText, page) {
+async function search (searchText, pageLink) {
   if (!authHeader) {
     throw new Error('Not authenticated!')
   }
+
   const {q} = resolveSearchType(searchText);
+
   const apiBase = 'https://api.byu.edu:443/byuapi/persons/v2/';
+
   const init = {
     method: 'GET',
     headers: new window.Headers({ 'Authorization': authHeader })
   };
+
   const fieldSets = 'basic,addresses,email_addresses,phones,employee_summaries,student_summaries';
-  const response = await window.fetch(`${apiBase}${q}&field_sets=${fieldSets}&page_start=1&page_size=25`, init); //TODO: Support pagination
+
+  const url = pageLink
+  ? pageLink
+  : `${apiBase}${q}&field_sets=${fieldSets}&page_size=50`;
+
+  const response = await window.fetch(url, init);
+
   if (response.ok) {
     const json = await response.json();
-    return json.values.map(parsePersonV2)
+    return parsePersonV2(json)
   } else if (response.status === 404) {
     return null
   }
@@ -3021,6 +3043,30 @@ class LitElement extends PropertiesMixin(HTMLElement) {
  * limitations under the License.
  */
 
+const executePersonsv2Request = async (search$$1, target, pageLink) => {
+  try {
+    const {next, prev, people} = await search(search$$1, pageLink);
+    target.dispatchEvent(new CustomEvent('byu-lookup-datasource-result', {
+      bubbles: true,
+      detail: people
+    }));
+    return {next, prev}
+  } catch (err) {
+    console.error(err);
+    target.dispatchEvent(new CustomEvent('byu-lookup-datasource-error', {
+      bubbles: true,
+      detail: err
+    }));
+  }
+};
+
+const setPendingSearch = (target) => {
+  const evtType = 'byu-lookup-datasource-searching';
+  const evt = new CustomEvent(evtType, {bubbles: true});
+  target.dispatchEvent(evt);
+};
+
+
 class ByuPersonsv2Datasource extends LitElement {
   connectedCallback () {
     super.connectedCallback();
@@ -3036,7 +3082,9 @@ class ByuPersonsv2Datasource extends LitElement {
 
   static get properties () {
     return {
-      search: String
+      search: String,
+      next: String,
+      prev: String
     }
   }
 
@@ -3048,25 +3096,43 @@ class ByuPersonsv2Datasource extends LitElement {
     return html$1`${label}`
   }
 
-  performSearch (searchFor) {
+  async performSearch (search$$1) {
     if (this.timeout) {
       clearTimeout(this.timeout);
     }
-    this.timeout = setTimeout(() => {
-      search(searchFor)
-      .then(result => {
-        this.dispatchEvent(new CustomEvent('byu-lookup-datasource-result', {
-          bubbles: true,
-          detail: result
-        }));
-      })
-      .catch(err => {
-        console.error(err);
-        this.dispatchEvent(new CustomEvent('byu-lookup-datasource-error', {
-          bubbles: true,
-          detail: err
-        }));
-      });
+    this.timeout = setTimeout(async () => {
+      setPendingSearch(this);
+      const {next, prev} = await executePersonsv2Request(this.search, this);
+      this.next = next;
+      this.prev = prev;
+    }, 100);
+  }
+
+  async nextPage () {
+    if (this.timeout) {
+      clearTimeout(this.timeout);
+    }
+    this.timeout = setTimeout(async () => {
+      if (this.next) {
+        setPendingSearch(this);
+        const {next, prev} = await executePersonsv2Request(this.search, this, this.next);
+        this.next = next;
+        this.prev = prev;
+      }
+    }, 100);
+  }
+
+  async prevPage () {
+    if (this.timeout) {
+      clearTimeout(this.timeout);
+    }
+    this.timeout = setTimeout(async () => {
+      if (this.prev) {
+        setPendingSearch(this);
+        const {next, prev} = await executePersonsv2Request(this.search, this, this.prev);
+        this.next = next;
+        this.prev = prev;
+      }
     }, 100);
   }
 

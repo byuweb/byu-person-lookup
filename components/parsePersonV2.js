@@ -18,6 +18,12 @@ import get from 'lodash.get'
 
 const pickFirst = (acc, curr) => acc || curr;
 
+function parseLinks(links) {
+  const next = get(links, 'persons__next.href')
+  const prev = get(links, 'persons__prev.href')
+  return {next, prev}
+}
+
 function parseAddresses (addresses) {
   if (addresses.metadata.validation_response.code !== 200) {
     return null
@@ -87,7 +93,7 @@ function parseStudentSummaries (studentSummaries) {
   return { studentStatus }
 }
 
-export default function (data) {
+function parsePerson (data) {
   return Object.assign({
     addresses: parseAddresses(data.addresses),
     email: parseEmailAddresses(data.email_addresses),
@@ -97,4 +103,10 @@ export default function (data) {
   parseEmployeeSummaries(data.employee_summaries),
   parseStudentSummaries(data.student_summaries),
   )
+}
+
+export default function (data) {
+  const people = data.values.map(parsePerson)
+  const {next, prev} = parseLinks(data.links)
+  return {next, prev, people}
 }

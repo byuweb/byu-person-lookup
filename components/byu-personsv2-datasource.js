@@ -17,18 +17,29 @@
 import * as personsv2Source from './personsv2LookupDataSource'
 import {LitElement, html} from '@polymer/lit-element'
 
-function debounce (f, t) {
-  // console.log(`debounce::f=${f}, t=${t}`)
-  const target = this
-  let timeout
-  return function (...args) {
-    if (timeout) {
-      clearTimeout(timeout)
-    }
-    const cb = ( () => f(...args) ).bind(target)
-    timeout = setTimeout(cb, t)
+const executePersonsv2Request = async (search, target, pageLink) => {
+  try {
+    const {next, prev, people} = await personsv2Source.search(search, pageLink)
+    target.dispatchEvent(new CustomEvent('byu-lookup-datasource-result', {
+      bubbles: true,
+      detail: people
+    }))
+    return {next, prev}
+  } catch (err) {
+    console.error(err)
+    target.dispatchEvent(new CustomEvent('byu-lookup-datasource-error', {
+      bubbles: true,
+      detail: err
+    }))
   }
 }
+
+const setPendingSearch = (target) => {
+  const evtType = 'byu-lookup-datasource-searching'
+  const evt = new CustomEvent(evtType, {bubbles: true})
+  target.dispatchEvent(evt)
+}
+
 
 class ByuPersonsv2Datasource extends LitElement {
   connectedCallback () {
@@ -45,7 +56,9 @@ class ByuPersonsv2Datasource extends LitElement {
 
   static get properties () {
     return {
-      search: String
+      search: String,
+      next: String,
+      prev: String
     }
   }
 
@@ -57,25 +70,43 @@ class ByuPersonsv2Datasource extends LitElement {
     return html`${label}`
   }
 
-  performSearch (searchFor) {
+  async performSearch (search) {
     if (this.timeout) {
       clearTimeout(this.timeout)
     }
-    this.timeout = setTimeout(() => {
-      personsv2Source.search(searchFor)
-      .then(result => {
-        this.dispatchEvent(new CustomEvent('byu-lookup-datasource-result', {
-          bubbles: true,
-          detail: result
-        }))
-      })
-      .catch(err => {
-        console.error(err)
-        this.dispatchEvent(new CustomEvent('byu-lookup-datasource-error', {
-          bubbles: true,
-          detail: err
-        }))
-      })
+    this.timeout = setTimeout(async () => {
+      setPendingSearch(this)
+      const {next, prev} = await executePersonsv2Request(this.search, this)
+      this.next = next
+      this.prev = prev
+    }, 100)
+  }
+
+  async nextPage () {
+    if (this.timeout) {
+      clearTimeout(this.timeout)
+    }
+    this.timeout = setTimeout(async () => {
+      if (this.next) {
+        setPendingSearch(this)
+        const {next, prev} = await executePersonsv2Request(this.search, this, this.next)
+        this.next = next
+        this.prev = prev
+      }
+    }, 100)
+  }
+
+  async prevPage () {
+    if (this.timeout) {
+      clearTimeout(this.timeout)
+    }
+    this.timeout = setTimeout(async () => {
+      if (this.prev) {
+        setPendingSearch(this)
+        const {next, prev} = await executePersonsv2Request(this.search, this, this.prev)
+        this.next = next
+        this.prev = prev
+      }
     }, 100)
   }
 

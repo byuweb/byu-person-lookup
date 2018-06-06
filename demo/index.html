@@ -29,6 +29,13 @@
 
         <p id="selection"></p>
         <div>
+            <label for="searchContext">Search Type</label>
+            <select id="searchContext">
+                <option value="directory">Directory</option>
+                <option value="admin">Admin</option>
+            </select>
+        </div>
+        <div>
             <h1>Test Authentication (from WSO2)</h1>
             <p>
             <strong>Instructions</strong>: To test the person lookup components, enter a bearer
@@ -92,6 +99,11 @@
             console.log(`Selected byuId: ${e.detail}`)
             const selectionElem = document.getElementById('selection')
             selectionElem.textContent = `Selected person ${JSON.stringify(e.detail, null, 2)}`
+        })
+
+        document.getElementById('searchContext').addEventListener('change', e => {
+            const val = e.target.value
+            document.getElementById('lookup').setAttribute('context', val)
         })
     </script>
 </body>

@@ -950,6 +950,12 @@ var lodash_get = get;
 
 const pickFirst = (acc, curr) => acc || curr;
 
+function parseLinks(links) {
+  const next = lodash_get(links, 'persons__next.href');
+  const prev = lodash_get(links, 'persons__prev.href');
+  return {next, prev}
+}
+
 function parseAddresses (addresses) {
   if (addresses.metadata.validation_response.code !== 200) {
     return null
@@ -1019,7 +1025,7 @@ function parseStudentSummaries (studentSummaries) {
   return { studentStatus }
 }
 
-function parsePersonV2 (data) {
+function parsePerson (data) {
   return Object.assign({
     addresses: parseAddresses(data.addresses),
     email: parseEmailAddresses(data.email_addresses),
@@ -1029,6 +1035,12 @@ function parsePersonV2 (data) {
   parseEmployeeSummaries(data.employee_summaries),
   parseStudentSummaries(data.student_summaries),
   )
+}
+
+function parsePersonV2 (data) {
+  const people = data.values.map(parsePerson);
+  const {next, prev} = parseLinks(data.links);
+  return {next, prev, people}
 }
 
 export default parsePersonV2;

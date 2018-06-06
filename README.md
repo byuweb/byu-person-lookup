@@ -34,7 +34,8 @@ Include the component somewhere in your page, providing the data source componen
 
 ## Configure the component
 The BYU Person Lookup component includes an optional `context` attribute that controls how the list
-of matching people is displayed. Valid values are `directory` (the default) which will display contact information, and `admin` which displays identifiers and student and employee statuses.
+of matching people is displayed. Valid values are `directory` (the default) which will display
+contact information, and `admin` which displays identifiers and student and employee statuses.
 ```html
 <byu-person-lookup id="myLookup" context="admin">
     <byu-personsv2-datasource></byu-personsv2-datasource>
@@ -62,6 +63,8 @@ In order to create a data source compatible with the lookup component, you must 
 certain events:
 1. byu-lookup-datasource-register: The data source must fire this event when it's ready for
    interaction.
+1. byu-lookup-datasource-searching: The data source fires this event when a search request has been
+   initiated.
 1. byu-lookup-datasource-error: The data source fires this event when a search request results in an
    error. The event detail should include a `message` to present to the user.
 1. byu-lookup-datasource-result: The data source fires this event when it has fetched data. The
@@ -89,14 +92,23 @@ certain events:
 ]
 ```
 
-You must also provide a `performSearch` method to be called by the lookup component:
+You must also provide `performSearch`, `nextPage`, and `prevPage` methods to be called by the lookup
+component:
 ```javascript
-function performSearch (searchText) {
-  /* Make ajax request... */
+async function performSearch () {
+  /* Implementation */
+}
+
+async function nextPage () {
+  /* Implementation */
+}
+
+async function prevPage () {
+  /* Implementation */
 }
 ```
 
-## Optional data source interaction.
+## Data Source Interaction.
 
 The lookup component will update the `search` parameter of its data source as the user types in the
 search box. The lookup component will also display any markup provided by the data source within a

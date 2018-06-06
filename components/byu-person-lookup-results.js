@@ -25,11 +25,13 @@ export default class ByuPersonLookupResults extends LitElement {
   static get properties () {
     return {
       results: Array,
-      context: String
+      context: String,
+      searchPending: Boolean
     }
   }
 
-  _render ({results, context}) {
+  _render ({results, context, searchPending}) {
+    // console.log(`byu-person-lookup-results::_render::searchPending=${searchPending}`)
     const css = html`
       <style>
         :host {
@@ -96,6 +98,7 @@ export default class ByuPersonLookupResults extends LitElement {
     tbody tr:nth-child(odd) {
       background-color: #E6E6E6;
     }
+    tbody tr.placeholder { cursor: default; }
     ol, ul {
       margin: 0;
       padding: 0;
@@ -106,7 +109,7 @@ export default class ByuPersonLookupResults extends LitElement {
       list-style-type: none;
       margin: 0;
     }
-    .close-button {
+    .nav-btn {
       padding: 0.3rem 1rem;
       border: thin solid #666666;
       border-radius: 0.05rem;
@@ -154,6 +157,15 @@ export default class ByuPersonLookupResults extends LitElement {
     .contact div svg {
       margin-top: calc(1rem - 14px);
     }
+    .card.placeholder { cursor: default; }
+    svg.placeholder { filter: blur(2px); }
+    svg.placeholder line {
+      animation: pulse 1500ms ease-in-out infinite alternate;
+    }
+    @keyframes pulse {
+      from { stroke: #999999; }
+      to { stroke: #CCCCCC; }
+    }
     @media only screen and (min-width: 650px) {
       .deck {
         display: grid;
@@ -191,6 +203,11 @@ export default class ByuPersonLookupResults extends LitElement {
   </style>
 `
 
+    const renderPlaceholder = () => html`
+      <svg class="placeholder" viewBox="0 0 100 3" preserveAspectRatio="none">
+        <line x1="5" x2="95" y1="1.5" y2="1.5" stroke="#666666" />
+      </svg>
+    `
     const renderAddress = address => html`
       <ul>
         ${address.map(line => html`<li>${line}</li>`)}
@@ -205,6 +222,9 @@ export default class ByuPersonLookupResults extends LitElement {
         <td>${row.studentStatus}</td>
       </tr>
     `
+    const renderPlaceholderRows = () => [1,2,3,4,5].map(() => html`
+      <tr class="placeholder"><td colspan="5">${renderPlaceholder()}</td></tr>
+    `)
 
     const renderEmployeeInfo = row => {
       if (/ACT/.test(row.employeeType)) {
@@ -239,6 +259,20 @@ export default class ByuPersonLookupResults extends LitElement {
         </div>
       </div>
     `
+    const renderPlaceholderCards = () => [1,2,3,4,5].map(() => html`
+      <div class="card placeholder">
+        <h3>${renderPlaceholder()}</h3>
+        <div>
+          <div>${renderPlaceholder()}</div>
+          <div>${renderPlaceholder()}</div>
+        </div>
+        <div>
+          <div>${renderPlaceholder()}</div>
+          <div>${renderPlaceholder()}</div>
+          <div>${renderPlaceholder()}</div>
+        </div>
+      </div>
+    `)
 
     const renderAdmin = results => html`
       <table>
@@ -252,18 +286,20 @@ export default class ByuPersonLookupResults extends LitElement {
           </tr>
         </thead>
         <tbody>
-          ${results && results.map ? results.map(r => renderAdminRow(r)) : ''}
+          ${results.map(r => renderAdminRow(r))}
+          ${searchPending ? renderPlaceholderRows() : '' }
         </tbody>
       </table>
     `
 
     const renderDirectory = results => html`
       <div class="deck">
-        ${results && results.map ? results.map(r => renderDirectoryCard(r)) : ''}
+        ${results.map(r => renderDirectoryCard(r))}
+        ${searchPending ? renderPlaceholderCards() : '' }
       </div>
     `
 
-    if (!results || results.length < 1) {
+    if (!results || !results.map || results.length < 1) {
       return html``
     }
 
@@ -276,10 +312,18 @@ export default class ByuPersonLookupResults extends LitElement {
       ${css}
       <div class="modal">
         <div class="results">
-          <h2>Lookup Results</h2>
+          <h2 id="top">Lookup Results</h2>
           ${context && context === 'admin' ? renderAdmin(results) : renderDirectory(results)}
           <div class="spacer"></div>
-          <button class="close-button" on-click="${e => this.close()}">Close</button>
+          ${IntersectionObserver
+            ? html`<button id="bottom" class="nav-btn" on-click="${e => this.close()}">Close</button>`
+            : html`
+                <div>
+                  <button class="nav-btn" on-click="${e => this.prev()}">Prev</button>
+                  <button class="nav-btn" on-click="${e => this.next()}">Next</button>
+                </div>
+              `
+          }
         </div>
         <button class="close-modal" on-click="${e => this.close()}">
           <svg alt="Search" width="24" height="24" viewBox="0 0 512 512">
@@ -290,24 +334,65 @@ export default class ByuPersonLookupResults extends LitElement {
     `
   }
 
+  dispatch(type, detail) {
+    const options = detail
+    ? { detail, bubbles: true, composed: true }
+    : { bubbles: true, composed: true }
+    const evt = new CustomEvent(type, options)
+    this.dispatchEvent(evt)
+  }
+
   select (row) {
     const {personId, byuId, netId, name} = row
-    const evt = new CustomEvent('byu-lookup-results-select', {
-      detail: {
-        personId,
-        byuId,
-        netId,
-        name
-      },
-      bubbles: true,
-      composed: true
+    this.dispatch('byu-lookup-results-select', {
+      personId,
+      byuId,
+      netId,
+      name
     })
-    this.dispatchEvent(evt)
-    this.dispatchEvent(new CustomEvent('byu-lookup-results-close'))
+    this.close()
   }
 
   close () {
-    this.dispatchEvent(new CustomEvent('byu-lookup-results-close'))
+    this.dispatch('byu-lookup-results-close')
+  }
+
+  next () {
+    if (this.searchPending) {
+      return
+    }
+    this.dispatch('byu-lookup-next-page')
+  }
+
+  prev () {
+    if (this.searchPending) {
+      return
+    }
+    this.dispatch('byu-lookup-prev-page')
+  }
+
+  _didRender () {
+    const top = this._root.getElementById('top')
+    const bottom = this._root.getElementById('bottom')
+    if (!IntersectionObserver || !top || !bottom) {
+      return
+    }
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) {
+          return
+        }
+        if (entry.target === bottom) {
+          // console.log(`IntersectionObserver::callback:nextPage`)
+          this.next()
+        } else if (entry.target === top) {
+          // console.log(`IntersectionObserver::callback:prevPage`)
+          this.prev()
+        }
+      })
+    }, {});
+    // observer.observe(top)
+    observer.observe(bottom)
   }
 }
 

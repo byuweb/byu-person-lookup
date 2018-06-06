@@ -58,21 +58,31 @@ export function resolveSearchType (search) {
             : { q: `?surname=${search}`, label: 'Name' }
 }
 
-export async function search (searchText, page) {
+export async function search (searchText, pageLink) {
   if (!authHeader) {
     throw new Error('Not authenticated!')
   }
+
   const {q} = resolveSearchType(searchText)
+
   const apiBase = 'https://api.byu.edu:443/byuapi/persons/v2/'
+
   const init = {
     method: 'GET',
     headers: new window.Headers({ 'Authorization': authHeader })
   }
+
   const fieldSets = 'basic,addresses,email_addresses,phones,employee_summaries,student_summaries'
-  const response = await window.fetch(`${apiBase}${q}&field_sets=${fieldSets}&page_start=1&page_size=25`, init) //TODO: Support pagination
+
+  const url = pageLink
+  ? pageLink
+  : `${apiBase}${q}&field_sets=${fieldSets}&page_size=50`
+
+  const response = await window.fetch(url, init)
+
   if (response.ok) {
     const json = await response.json()
-    return json.values.map(parsePersonV2)
+    return parsePersonV2(json)
   } else if (response.status === 404) {
     return null
   }

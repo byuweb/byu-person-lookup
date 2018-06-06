@@ -130,7 +130,10 @@ export default class ByuPersonLookup extends LitElement {
       <byu-person-lookup-results
         results="${results}"
         context="${context}"
+        searchPending="${this.searchPending}"
         on-byu-lookup-results-close="${e => this.closeResults()}"
+        on-byu-lookup-next-page="${e => this.loadNextPage()}"
+        on-byu-lookup-prev-page="${e => this.loadPrevPage()}"
       ></byu-person-lookup-results>
     </slot>
     `
@@ -144,7 +147,10 @@ export default class ByuPersonLookup extends LitElement {
     this.__lookupProvider = provider
     this.addEventListener('byu-lookup-datasource-result', this.searchResults)
     this.addEventListener('byu-lookup-datasource-error', this.searchError)
+    this.addEventListener('byu-lookup-datasource-searching', this.searchBegun)
     this.fetchFromProvider = this.__lookupProvider.performSearch
+    this.nextPageFromProvider = this.__lookupProvider.nextPage
+    this.prevPageFromProvider = this.__lookupProvider.prevPage
   }
 
   connectedCallback () {
@@ -165,14 +171,28 @@ export default class ByuPersonLookup extends LitElement {
 
   searchResults (e) {
     e.stopPropagation() // Don't trigger any other lookup components
-    console.log('search results:\n', e.detail)
-    this.results = e.detail
+    // console.log('search results:\n', e.detail)
+    /*
+    this.results = Array.isArray(this.results)
+    ? this.results.length > 120
+    ? this.results.slice(-120)
+    : this.results
+    : []
+    */
+    this.results = this.results.concat(e.detail)
     this.searchPending = false
   }
 
   searchError (e) {
     e.stopPropagation() // Don't trigger any other lookup components
-    console.log('search error:\n', e.detail)
+    this.searchPending = false
+    alert(e.detail)
+    console.error('search error:\n', e.detail)
+  }
+
+  searchBegun (e) {
+    e.stopPropagation() // Don't trigger any other lookup components
+    this.searchPending = true
   }
 
   searchChange (e) {
@@ -185,9 +205,19 @@ export default class ByuPersonLookup extends LitElement {
   }
 
   doSearch () {
-    console.log(`doSearch:search: ${this.search}`)
+    // console.log(`doSearch:search: ${this.search}`)
+    this.results = []
     this.fetchFromProvider(this.search)
-    this.searchPending = true
+  }
+
+  loadNextPage () {
+    // console.log(`loadNextPage`)
+    this.nextPageFromProvider()
+  }
+
+  loadPrevPage () {
+    // console.log(`loadPrevPage`)
+    this.prevPageFromProvider()
   }
 }
 
