@@ -2104,7 +2104,7 @@ class ByuPersonLookupResults extends LitElement {
     `);
 
     const renderEmployeeInfo = row => {
-      if (/ACT/.test(row.employeeType)) {
+      if (/ACT|LEV/.test(row.employeeType)) {
         return html$1`
           <div>
             <div>${row.jobTitle}</div>

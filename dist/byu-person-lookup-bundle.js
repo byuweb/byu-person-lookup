@@ -2108,7 +2108,7 @@ class ByuPersonLookupResults extends LitElement {
     `);
 
     const renderEmployeeInfo = row => {
-      if (/ACT/.test(row.employeeType)) {
+      if (/ACT|LEV/.test(row.employeeType)) {
         return html$1`
           <div>
             <div>${row.jobTitle}</div>
@@ -2192,7 +2192,6 @@ class ByuPersonLookupResults extends LitElement {
     return html$1`
       ${css}
       <div class="modal">
-        <h1 style="color: white;">${searchPending ? 'SEARCH PENDING' : ''}</h1>
         <div class="results">
           <h2 id="top">Lookup Results</h2>
           ${context && context === 'admin' ? renderAdmin(results) : renderDirectory(results)}
