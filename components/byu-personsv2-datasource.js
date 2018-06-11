@@ -17,6 +17,8 @@
 import * as personsv2Source from './personsv2LookupDataSource'
 import {LitElement, html} from '@polymer/lit-element'
 
+const {CustomEvent} = window
+
 const executePersonsv2Request = async (search, target, pageLink) => {
   try {
     const {next, prev, people} = await personsv2Source.search(search, pageLink)
@@ -39,7 +41,6 @@ const setPendingSearch = (target) => {
   const evt = new CustomEvent(evtType, {bubbles: true})
   target.dispatchEvent(evt)
 }
-
 
 class ByuPersonsv2Datasource extends LitElement {
   connectedCallback () {
@@ -109,7 +110,6 @@ class ByuPersonsv2Datasource extends LitElement {
       }
     }, 100)
   }
-
 }
 
 console.log('registering personsv2 datasource')

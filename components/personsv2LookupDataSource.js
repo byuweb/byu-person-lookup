@@ -74,9 +74,7 @@ export async function search (searchText, pageLink) {
 
   const fieldSets = 'basic,addresses,email_addresses,phones,employee_summaries,student_summaries'
 
-  const url = pageLink
-  ? pageLink
-  : `${apiBase}${q}&field_sets=${fieldSets}&page_size=50`
+  const url = pageLink || `${apiBase}${q}&field_sets=${fieldSets}&page_size=50`
 
   const response = await window.fetch(url, init)
 
@@ -93,7 +91,7 @@ export async function search (searchText, pageLink) {
 
 // in disconnectedCallback():
 export function disconnect () {
-  if(observer) {
+  if (observer) {
     observer.disconnect()
   }
   observer = null

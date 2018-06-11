@@ -950,7 +950,7 @@ var lodash_get = get;
 
 const pickFirst = (acc, curr) => acc || curr;
 
-function parseLinks(links) {
+function parseLinks (links) {
   const next = lodash_get(links, 'persons__next.href');
   const prev = lodash_get(links, 'persons__prev.href');
   return {next, prev}
@@ -981,10 +981,12 @@ function parseBasic (basic) {
   const name = lodash_get(basic, 'name_lnf.value', '');
   const byuId = lodash_get(basic, 'byu_id.value', '');
   const netId = lodash_get(basic, 'net_id.value', '');
+  const personId = lodash_get(basic, 'person_id.value', '');
   return {
     name,
     byuId,
-    netId
+    netId,
+    personId
   }
 }
 
@@ -1002,8 +1004,8 @@ function parsePhones (phones) {
     return null
   }
   return phones.values.map(p => lodash_get(p, 'phone_number.value', ''))
-  .filter(p => !!p)
-  .reduce(pickFirst, '')
+    .filter(p => !!p)
+    .reduce(pickFirst, '')
 }
 
 function parseEmployeeSummaries (employeeSummaries) {
@@ -1033,7 +1035,7 @@ function parsePerson (data) {
   },
   parseBasic(data.basic),
   parseEmployeeSummaries(data.employee_summaries),
-  parseStudentSummaries(data.student_summaries),
+  parseStudentSummaries(data.student_summaries)
   )
 }
 

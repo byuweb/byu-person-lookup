@@ -16,9 +16,9 @@
 
 import get from 'lodash.get'
 
-const pickFirst = (acc, curr) => acc || curr;
+const pickFirst = (acc, curr) => acc || curr
 
-function parseLinks(links) {
+function parseLinks (links) {
   const next = get(links, 'persons__next.href')
   const prev = get(links, 'persons__prev.href')
   return {next, prev}
@@ -34,7 +34,7 @@ function parseAddresses (addresses) {
       get(c, 'address_line_2.value', ''),
       get(c, 'address_line_3.value', ''),
       get(c, 'address_line_4.value', '')
-    ].filter(l => l.trim().length > 0);
+    ].filter(l => l.trim().length > 0)
     const key = {
       'MAL': 'mailing',
       'RES': 'residential',
@@ -49,10 +49,12 @@ function parseBasic (basic) {
   const name = get(basic, 'name_lnf.value', '')
   const byuId = get(basic, 'byu_id.value', '')
   const netId = get(basic, 'net_id.value', '')
+  const personId = get(basic, 'person_id.value', '')
   return {
     name,
     byuId,
-    netId
+    netId,
+    personId
   }
 }
 
@@ -70,8 +72,8 @@ function parsePhones (phones) {
     return null
   }
   return phones.values.map(p => get(p, 'phone_number.value', ''))
-  .filter(p => !!p)
-  .reduce(pickFirst, '')
+    .filter(p => !!p)
+    .reduce(pickFirst, '')
 }
 
 function parseEmployeeSummaries (employeeSummaries) {
@@ -101,7 +103,7 @@ function parsePerson (data) {
   },
   parseBasic(data.basic),
   parseEmployeeSummaries(data.employee_summaries),
-  parseStudentSummaries(data.student_summaries),
+  parseStudentSummaries(data.student_summaries)
   )
 }
 

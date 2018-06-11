@@ -21,6 +21,8 @@ import faEnvelope from '@fortawesome/fontawesome-free-solid/faEnvelope'
 import faPhone from '@fortawesome/fontawesome-free-solid/faPhone'
 import faHome from '@fortawesome/fontawesome-free-solid/faHome'
 
+const {IntersectionObserver, CustomEvent} = window
+
 export default class ByuPersonLookupResults extends LitElement {
   static get properties () {
     return {
@@ -222,7 +224,7 @@ export default class ByuPersonLookupResults extends LitElement {
         <td>${row.studentStatus}</td>
       </tr>
     `
-    const renderPlaceholderRows = () => [1,2,3,4,5].map(() => html`
+    const renderPlaceholderRows = () => [1, 2, 3, 4, 5].map(() => html`
       <tr class="placeholder"><td colspan="5">${renderPlaceholder()}</td></tr>
     `)
 
@@ -259,7 +261,7 @@ export default class ByuPersonLookupResults extends LitElement {
         </div>
       </div>
     `
-    const renderPlaceholderCards = () => [1,2,3,4,5].map(() => html`
+    const renderPlaceholderCards = () => [1, 2, 3, 4, 5].map(() => html`
       <div class="card placeholder">
         <h3>${renderPlaceholder()}</h3>
         <div>
@@ -287,7 +289,7 @@ export default class ByuPersonLookupResults extends LitElement {
         </thead>
         <tbody>
           ${results.map(r => renderAdminRow(r))}
-          ${searchPending ? renderPlaceholderRows() : '' }
+          ${searchPending ? renderPlaceholderRows() : ''}
         </tbody>
       </table>
     `
@@ -295,7 +297,7 @@ export default class ByuPersonLookupResults extends LitElement {
     const renderDirectory = results => html`
       <div class="deck">
         ${results.map(r => renderDirectoryCard(r))}
-        ${searchPending ? renderPlaceholderCards() : '' }
+        ${searchPending ? renderPlaceholderCards() : ''}
       </div>
     `
 
@@ -316,14 +318,14 @@ export default class ByuPersonLookupResults extends LitElement {
           ${context && context === 'admin' ? renderAdmin(results) : renderDirectory(results)}
           <div class="spacer"></div>
           ${IntersectionObserver
-            ? html`<button id="bottom" class="nav-btn" on-click="${e => this.close()}">Close</button>`
-            : html`
-                <div>
-                  <button class="nav-btn" on-click="${e => this.prev()}">Prev</button>
-                  <button class="nav-btn" on-click="${e => this.next()}">Next</button>
-                </div>
-              `
-          }
+    ? html`<button id="bottom" class="nav-btn" on-click="${e => this.close()}">Close</button>`
+    : html`
+              <div>
+                <button class="nav-btn" on-click="${e => this.prev()}">Prev</button>
+                <button class="nav-btn" on-click="${e => this.next()}">Next</button>
+              </div>
+            `
+}
         </div>
         <button class="close-modal" on-click="${e => this.close()}">
           <svg alt="Search" width="24" height="24" viewBox="0 0 512 512">
@@ -334,10 +336,10 @@ export default class ByuPersonLookupResults extends LitElement {
     `
   }
 
-  dispatch(type, detail) {
+  dispatch (type, detail) {
     const options = detail
-    ? { detail, bubbles: true, composed: true }
-    : { bubbles: true, composed: true }
+      ? { detail, bubbles: true, composed: true }
+      : { bubbles: true, composed: true }
     const evt = new CustomEvent(type, options)
     this.dispatchEvent(evt)
   }
@@ -390,11 +392,13 @@ export default class ByuPersonLookupResults extends LitElement {
           this.prev()
         }
       })
-    }, {});
+    }, {})
     // observer.observe(top)
     observer.observe(bottom)
   }
 }
 
+/*
 console.log('registering person lookup results')
 window.customElements.define('byu-person-lookup-results', ByuPersonLookupResults)
+*/

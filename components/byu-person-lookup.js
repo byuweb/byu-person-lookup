@@ -37,6 +37,10 @@ export default class ByuPersonLookup extends LitElement {
     const css = html`
       <style>
         :host {
+          display: inline-block;
+        }
+        :host([hidden]) {
+          display: none;
         }
         * {
          font-family: 'Gotham A', 'Gotham B', Helvetica Nue, Helvetica, sans-serif;
@@ -186,7 +190,7 @@ export default class ByuPersonLookup extends LitElement {
   searchError (e) {
     e.stopPropagation() // Don't trigger any other lookup components
     this.searchPending = false
-    alert(e.detail)
+    window.alert(e.detail)
     console.error('search error:\n', e.detail)
   }
 
@@ -223,3 +227,6 @@ export default class ByuPersonLookup extends LitElement {
 
 console.log('registering person lookup')
 window.customElements.define('byu-person-lookup', ByuPersonLookup)
+
+console.log('registering person lookup results')
+window.customElements.define('byu-person-lookup-results', ByuPersonLookupResults)

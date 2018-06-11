@@ -998,7 +998,7 @@ var lodash_get = get;
 
 const pickFirst = (acc, curr) => acc || curr;
 
-function parseLinks(links) {
+function parseLinks (links) {
   const next = lodash_get(links, 'persons__next.href');
   const prev = lodash_get(links, 'persons__prev.href');
   return {next, prev}
@@ -1029,10 +1029,12 @@ function parseBasic (basic) {
   const name = lodash_get(basic, 'name_lnf.value', '');
   const byuId = lodash_get(basic, 'byu_id.value', '');
   const netId = lodash_get(basic, 'net_id.value', '');
+  const personId = lodash_get(basic, 'person_id.value', '');
   return {
     name,
     byuId,
-    netId
+    netId,
+    personId
   }
 }
 
@@ -1050,8 +1052,8 @@ function parsePhones (phones) {
     return null
   }
   return phones.values.map(p => lodash_get(p, 'phone_number.value', ''))
-  .filter(p => !!p)
-  .reduce(pickFirst, '')
+    .filter(p => !!p)
+    .reduce(pickFirst, '')
 }
 
 function parseEmployeeSummaries (employeeSummaries) {
@@ -1081,7 +1083,7 @@ function parsePerson (data) {
   },
   parseBasic(data.basic),
   parseEmployeeSummaries(data.employee_summaries),
-  parseStudentSummaries(data.student_summaries),
+  parseStudentSummaries(data.student_summaries)
   )
 }
 
@@ -1164,9 +1166,7 @@ async function search (searchText, pageLink) {
 
   const fieldSets = 'basic,addresses,email_addresses,phones,employee_summaries,student_summaries';
 
-  const url = pageLink
-  ? pageLink
-  : `${apiBase}${q}&field_sets=${fieldSets}&page_size=50`;
+  const url = pageLink || `${apiBase}${q}&field_sets=${fieldSets}&page_size=50`;
 
   const response = await window.fetch(url, init);
 
@@ -1183,7 +1183,7 @@ async function search (searchText, pageLink) {
 
 // in disconnectedCallback():
 function disconnect () {
-  if(observer) {
+  if (observer) {
     observer.disconnect();
   }
   observer = null;

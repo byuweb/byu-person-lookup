@@ -998,7 +998,7 @@ var lodash_get = get;
 
 const pickFirst = (acc, curr) => acc || curr;
 
-function parseLinks(links) {
+function parseLinks (links) {
   const next = lodash_get(links, 'persons__next.href');
   const prev = lodash_get(links, 'persons__prev.href');
   return {next, prev}
@@ -1029,10 +1029,12 @@ function parseBasic (basic) {
   const name = lodash_get(basic, 'name_lnf.value', '');
   const byuId = lodash_get(basic, 'byu_id.value', '');
   const netId = lodash_get(basic, 'net_id.value', '');
+  const personId = lodash_get(basic, 'person_id.value', '');
   return {
     name,
     byuId,
-    netId
+    netId,
+    personId
   }
 }
 
@@ -1050,8 +1052,8 @@ function parsePhones (phones) {
     return null
   }
   return phones.values.map(p => lodash_get(p, 'phone_number.value', ''))
-  .filter(p => !!p)
-  .reduce(pickFirst, '')
+    .filter(p => !!p)
+    .reduce(pickFirst, '')
 }
 
 function parseEmployeeSummaries (employeeSummaries) {
@@ -1081,7 +1083,7 @@ function parsePerson (data) {
   },
   parseBasic(data.basic),
   parseEmployeeSummaries(data.employee_summaries),
-  parseStudentSummaries(data.student_summaries),
+  parseStudentSummaries(data.student_summaries)
   )
 }
 
@@ -3043,17 +3045,19 @@ class LitElement extends PropertiesMixin(HTMLElement) {
  * limitations under the License.
  */
 
+const {CustomEvent: CustomEvent$1} = window;
+
 const executePersonsv2Request = async (search$$1, target, pageLink) => {
   try {
     const {next, prev, people} = await search(search$$1, pageLink);
-    target.dispatchEvent(new CustomEvent('byu-lookup-datasource-result', {
+    target.dispatchEvent(new CustomEvent$1('byu-lookup-datasource-result', {
       bubbles: true,
       detail: people
     }));
     return {next, prev}
   } catch (err) {
     console.error(err);
-    target.dispatchEvent(new CustomEvent('byu-lookup-datasource-error', {
+    target.dispatchEvent(new CustomEvent$1('byu-lookup-datasource-error', {
       bubbles: true,
       detail: err
     }));
@@ -3062,16 +3066,15 @@ const executePersonsv2Request = async (search$$1, target, pageLink) => {
 
 const setPendingSearch = (target) => {
   const evtType = 'byu-lookup-datasource-searching';
-  const evt = new CustomEvent(evtType, {bubbles: true});
+  const evt = new CustomEvent$1(evtType, {bubbles: true});
   target.dispatchEvent(evt);
 };
-
 
 class ByuPersonsv2Datasource extends LitElement {
   connectedCallback () {
     super.connectedCallback();
     connect();
-    const evt = new CustomEvent('byu-lookup-datasource-register', {bubbles: true});
+    const evt = new CustomEvent$1('byu-lookup-datasource-register', {bubbles: true});
     this.dispatchEvent(evt);
   }
 
@@ -3135,7 +3138,6 @@ class ByuPersonsv2Datasource extends LitElement {
       }
     }, 100);
   }
-
 }
 
 console.log('registering personsv2 datasource');

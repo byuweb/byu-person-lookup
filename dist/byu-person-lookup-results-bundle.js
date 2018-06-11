@@ -1898,6 +1898,8 @@ var faHome = { prefix: 'fas', iconName: 'home', icon: [576, 512, [], "f015", "M4
  * limitations under the License.
  */
 
+const {IntersectionObserver, CustomEvent} = window;
+
 class ByuPersonLookupResults extends LitElement {
   static get properties () {
     return {
@@ -2099,7 +2101,7 @@ class ByuPersonLookupResults extends LitElement {
         <td>${row.studentStatus}</td>
       </tr>
     `;
-    const renderPlaceholderRows = () => [1,2,3,4,5].map(() => html$1`
+    const renderPlaceholderRows = () => [1, 2, 3, 4, 5].map(() => html$1`
       <tr class="placeholder"><td colspan="5">${renderPlaceholder()}</td></tr>
     `);
 
@@ -2136,7 +2138,7 @@ class ByuPersonLookupResults extends LitElement {
         </div>
       </div>
     `;
-    const renderPlaceholderCards = () => [1,2,3,4,5].map(() => html$1`
+    const renderPlaceholderCards = () => [1, 2, 3, 4, 5].map(() => html$1`
       <div class="card placeholder">
         <h3>${renderPlaceholder()}</h3>
         <div>
@@ -2164,7 +2166,7 @@ class ByuPersonLookupResults extends LitElement {
         </thead>
         <tbody>
           ${results.map(r => renderAdminRow(r))}
-          ${searchPending ? renderPlaceholderRows() : '' }
+          ${searchPending ? renderPlaceholderRows() : ''}
         </tbody>
       </table>
     `;
@@ -2172,7 +2174,7 @@ class ByuPersonLookupResults extends LitElement {
     const renderDirectory = results => html$1`
       <div class="deck">
         ${results.map(r => renderDirectoryCard(r))}
-        ${searchPending ? renderPlaceholderCards() : '' }
+        ${searchPending ? renderPlaceholderCards() : ''}
       </div>
     `;
 
@@ -2193,14 +2195,14 @@ class ByuPersonLookupResults extends LitElement {
           ${context && context === 'admin' ? renderAdmin(results) : renderDirectory(results)}
           <div class="spacer"></div>
           ${IntersectionObserver
-            ? html$1`<button id="bottom" class="nav-btn" on-click="${e => this.close()}">Close</button>`
-            : html$1`
-                <div>
-                  <button class="nav-btn" on-click="${e => this.prev()}">Prev</button>
-                  <button class="nav-btn" on-click="${e => this.next()}">Next</button>
-                </div>
-              `
-          }
+    ? html$1`<button id="bottom" class="nav-btn" on-click="${e => this.close()}">Close</button>`
+    : html$1`
+              <div>
+                <button class="nav-btn" on-click="${e => this.prev()}">Prev</button>
+                <button class="nav-btn" on-click="${e => this.next()}">Next</button>
+              </div>
+            `
+}
         </div>
         <button class="close-modal" on-click="${e => this.close()}">
           <svg alt="Search" width="24" height="24" viewBox="0 0 512 512">
@@ -2211,10 +2213,10 @@ class ByuPersonLookupResults extends LitElement {
     `
   }
 
-  dispatch(type, detail) {
+  dispatch (type, detail) {
     const options = detail
-    ? { detail, bubbles: true, composed: true }
-    : { bubbles: true, composed: true };
+      ? { detail, bubbles: true, composed: true }
+      : { bubbles: true, composed: true };
     const evt = new CustomEvent(type, options);
     this.dispatchEvent(evt);
   }
@@ -2273,7 +2275,9 @@ class ByuPersonLookupResults extends LitElement {
   }
 }
 
-console.log('registering person lookup results');
-window.customElements.define('byu-person-lookup-results', ByuPersonLookupResults);
+/*
+console.log('registering person lookup results')
+window.customElements.define('byu-person-lookup-results', ByuPersonLookupResults)
+*/
 
 export default ByuPersonLookupResults;
