@@ -224,7 +224,7 @@ export default class ByuPersonLookupResults extends LitElement {
         <td>${row.studentStatus}</td>
       </tr>
     `
-    const renderPlaceholderRows = () => [1, 2, 3, 4, 5].map(() => html`
+    const renderPlaceholderRows = () => [1, 2, 3, 4, 5, 6].map(() => html`
       <tr class="placeholder"><td colspan="5">${renderPlaceholder()}</td></tr>
     `)
 
@@ -261,7 +261,7 @@ export default class ByuPersonLookupResults extends LitElement {
         </div>
       </div>
     `
-    const renderPlaceholderCards = () => [1, 2, 3, 4, 5].map(() => html`
+    const renderPlaceholderCards = () => [1, 2, 3, 4, 5, 6].map(() => html`
       <div class="card placeholder">
         <h3>${renderPlaceholder()}</h3>
         <div>

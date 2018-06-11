@@ -2101,7 +2101,7 @@ class ByuPersonLookupResults extends LitElement {
         <td>${row.studentStatus}</td>
       </tr>
     `;
-    const renderPlaceholderRows = () => [1, 2, 3, 4, 5].map(() => html$1`
+    const renderPlaceholderRows = () => [1, 2, 3, 4, 5, 6].map(() => html$1`
       <tr class="placeholder"><td colspan="5">${renderPlaceholder()}</td></tr>
     `);
 
@@ -2138,7 +2138,7 @@ class ByuPersonLookupResults extends LitElement {
         </div>
       </div>
     `;
-    const renderPlaceholderCards = () => [1, 2, 3, 4, 5].map(() => html$1`
+    const renderPlaceholderCards = () => [1, 2, 3, 4, 5, 6].map(() => html$1`
       <div class="card placeholder">
         <h3>${renderPlaceholder()}</h3>
         <div>
