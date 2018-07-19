@@ -162,11 +162,12 @@ export default class ByuPersonLookupResults extends LitElement {
     .card.placeholder { cursor: default; }
     svg.placeholder { filter: blur(2px); }
     svg.placeholder line {
-      animation: pulse 1500ms ease-in-out infinite alternate;
+      animation: pulse 1000ms ease-in-out infinite alternate;
     }
     @keyframes pulse {
       from { stroke: #999999; }
-      to { stroke: #CCCCCC; }
+      70% { stroke: #999999; }
+      to { stroke: #B3B5B7; }
     }
     @media only screen and (min-width: 650px) {
       .deck {
