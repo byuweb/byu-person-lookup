@@ -43,7 +43,7 @@ export default class ByuPersonLookup extends LitElement {
           display: none;
         }
         * {
-         font-family: 'Gotham A', 'Gotham B', Helvetica Nue, Helvetica, sans-serif;
+         font-family: 'HCo Ringside Narrow SSm', Arial Narrow, Arial, sans-serif;
         }
         div {
           position: relative;

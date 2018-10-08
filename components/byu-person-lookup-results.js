@@ -40,7 +40,7 @@ export default class ByuPersonLookupResults extends LitElement {
           padding: 1rem;
         }
     * {
-      font-family: 'Gotham A', 'Gotham B', Helvetica Nue, Helvetica, sans-serif;
+      font-family: 'HCo Ringside Narrow SSm', Arial Narrow, Arial, sans-serif;
     }
     .modal {
       z-index: 98;
