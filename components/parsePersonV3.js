@@ -102,8 +102,8 @@ function parsePerson (data) {
     phone: parsePhones(data.phones)
   },
   parseBasic(data.basic),
-  parseEmployeeSummaries(data.employee_summaries),
-  parseStudentSummaries(data.student_summaries)
+  parseEmployeeSummaries(data.employee_summary),
+  parseStudentSummaries(data.student_summary)
   )
 }
 
