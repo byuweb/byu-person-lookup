@@ -2324,7 +2324,7 @@ class ByuPersonLookupResults extends LitElement {
           <div>
             <div>${row.jobTitle}</div>
             <div>${row.department}</div>
-            <div>${row.addresses.work ? renderAddress(row.addresses.work) : ''}</div>
+            <div>${row.addresses ? row.addresses.work ? renderAddress(row.addresses.work) : '' : ''}</div>
           </div>
         `
       }
@@ -2347,7 +2347,7 @@ class ByuPersonLookupResults extends LitElement {
         <div class="contact">
           <div>${renderIcon(envelopeIconPath)}${row.email}</div>
           <div>${renderIcon(phoneIconPath)}${row.phone}</div>
-          <div>${renderIcon(homeIconPath)}${row.addresses.mailing ? renderAddress(row.addresses.mailing) : ''}</div>
+          <div>${renderIcon(homeIconPath)}${row.addresses ? row.addresses.mailing ? renderAddress(row.addresses.mailing) : '' : ''}</div>
         </div>
       </div>
     `;

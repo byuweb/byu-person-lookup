@@ -960,7 +960,9 @@ function parseAddresses (addresses) {
   if (addresses.metadata.validation_response.code !== 200) {
     return null
   }
-  return addresses.values.reduce((all, c) => {
+  return addresses.values
+      .filter(address => address.metadata.validation_response.code === 200)
+      .reduce((all, c) => {
     const data = [
       lodash_get(c, 'address_line_1.value', ''),
       lodash_get(c, 'address_line_2.value', ''),
