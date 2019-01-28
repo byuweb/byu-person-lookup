@@ -27,12 +27,12 @@
     <div id="content">
 
         <h2>PersonsV3 Lookup</h2>
-        <byu-person-lookup id="lookup" context="directory">
+        <byu-person-lookup id="lookup-2" context="directory">
             <byu-personsv3-datasource></byu-personsv3-datasource>
         </byu-person-lookup>
 
         <h2>PersonsV2 Lookup</h2>
-        <byu-person-lookup id="lookup" context="directory">
+        <byu-person-lookup id="lookup-3" context="directory">
             <byu-personsv2-datasource></byu-personsv2-datasource>
         </byu-person-lookup>
 
@@ -104,7 +104,13 @@
 
         document.getElementById('bearer').addEventListener('change', updateAuthentication)
 
-        document.getElementById('lookup').addEventListener('byu-lookup-results-select', e => {
+        document.getElementById('lookup-2').addEventListener('byu-lookup-results-select', e => {
+            console.log(`Selected byuId: ${e.detail}`)
+            const selectionElem = document.getElementById('selection')
+            selectionElem.textContent = `Selected person ${JSON.stringify(e.detail, null, 2)}`
+        })
+
+        document.getElementById('lookup-3').addEventListener('byu-lookup-results-select', e => {
             console.log(`Selected byuId: ${e.detail}`)
             const selectionElem = document.getElementById('selection')
             selectionElem.textContent = `Selected person ${JSON.stringify(e.detail, null, 2)}`
@@ -112,7 +118,8 @@
 
         document.getElementById('searchContext').addEventListener('change', e => {
             const val = e.target.value
-            document.getElementById('lookup').setAttribute('context', val)
+            document.getElementById('lookup-2').setAttribute('context', val)
+            document.getElementById('lookup-3').setAttribute('context', val)
         })
     </script>
 </body>
