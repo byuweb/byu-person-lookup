@@ -62,7 +62,7 @@ const dedupingMixin = function(mixin) {
     return extended;
   }
 
-  return dedupingMixin;
+  return /** @type {T} */ (dedupingMixin);
 };
 /* eslint-enable valid-jsdoc */
 
@@ -178,17 +178,12 @@ const microtask = microTask;
  * @summary Element class mixin for reacting to property changes from
  *   generated property accessors.
  */
-const PropertiesChanged = dedupingMixin(
-    /**
-     * @template T
-     * @param {function(new:T)} superClass Class to apply mixin to.
-     * @return {function(new:T)} superClass with mixin applied.
-     */
-    (superClass) => {
+const PropertiesChanged = dedupingMixin(superClass => {
 
   /**
    * @polymer
    * @mixinClass
+   * @extends {superClass}
    * @implements {Polymer_PropertiesChanged}
    * @unrestricted
    */
@@ -247,7 +242,6 @@ const PropertiesChanged = dedupingMixin(
      *   protected `_setProperty` function must be used to set the property
      * @return {void}
      * @protected
-     * @override
      */
     _createPropertyAccessor(property, readOnly) {
       this._addPropertyToAttributeMap(property);
@@ -266,7 +260,6 @@ const PropertiesChanged = dedupingMixin(
      * used when deserializing attribute values to properties.
      *
      * @param {string} property Name of the property
-     * @override
      */
     _addPropertyToAttributeMap(property) {
       if (!this.hasOwnProperty('__dataAttributes')) {
@@ -283,7 +276,6 @@ const PropertiesChanged = dedupingMixin(
      * @param {string} property Name of the property
      * @param {boolean=} readOnly When true, no setter is created
      * @return {void}
-     * @override
      */
      _definePropertyAccessor(property, readOnly) {
       Object.defineProperty(this, property, {
@@ -326,7 +318,6 @@ const PropertiesChanged = dedupingMixin(
      *
      * @return {void}
      * @public
-     * @override
      */
     ready() {
       this.__dataReady = true;
@@ -341,7 +332,6 @@ const PropertiesChanged = dedupingMixin(
      *
      * @return {void}
      * @protected
-     * @override
      */
     _initializeProperties() {
       // Capture instance properties; these will be set into accessors
@@ -368,7 +358,6 @@ const PropertiesChanged = dedupingMixin(
      *   when creating property accessors.
      * @return {void}
      * @protected
-     * @override
      */
     _initializeInstanceProperties(props) {
       Object.assign(this, props);
@@ -382,7 +371,6 @@ const PropertiesChanged = dedupingMixin(
      * @param {*} value Value to set
      * @return {void}
      * @protected
-     * @override
      */
     _setProperty(property, value) {
       if (this._setPendingProperty(property, value)) {
@@ -395,7 +383,6 @@ const PropertiesChanged = dedupingMixin(
      * @param {string} property Name of property
      * @return {*} Value for the given property
      * @protected
-     * @override
      */
     _getProperty(property) {
       return this.__data[property];
@@ -413,7 +400,6 @@ const PropertiesChanged = dedupingMixin(
      * @param {boolean=} ext Not used here; affordance for closure
      * @return {boolean} Returns true if the property changed
      * @protected
-     * @override
      */
     _setPendingProperty(property, value, ext) {
       let old = this.__data[property];
@@ -440,7 +426,6 @@ const PropertiesChanged = dedupingMixin(
      *
      * @return {void}
      * @protected
-     * @override
      */
     _invalidateProperties() {
       if (!this.__dataInvalid && this.__dataReady) {
@@ -464,7 +449,6 @@ const PropertiesChanged = dedupingMixin(
      *
      * @return {void}
      * @protected
-     * @override
      */
     _enableProperties() {
       if (!this.__dataEnabled) {
@@ -485,7 +469,6 @@ const PropertiesChanged = dedupingMixin(
      *
      * @return {void}
      * @protected
-     * @override
      */
     _flushProperties() {
       const props = this.__data;
@@ -504,12 +487,11 @@ const PropertiesChanged = dedupingMixin(
      * properties are pending. Override to customize when
      * `_propertiesChanged` is called.
      * @param {!Object} currentProps Bag of all current accessor values
-     * @param {?Object} changedProps Bag of properties changed since the last
+     * @param {!Object} changedProps Bag of properties changed since the last
      *   call to `_propertiesChanged`
-     * @param {?Object} oldProps Bag of previous values for each property
+     * @param {!Object} oldProps Bag of previous values for each property
      *   in `changedProps`
      * @return {boolean} true if changedProps is truthy
-     * @override
      */
     _shouldPropertiesChange(currentProps, changedProps, oldProps) { // eslint-disable-line no-unused-vars
       return Boolean(changedProps);
@@ -520,13 +502,12 @@ const PropertiesChanged = dedupingMixin(
      * `_createPropertyAccessor` have been set.
      *
      * @param {!Object} currentProps Bag of all current accessor values
-     * @param {?Object} changedProps Bag of properties changed since the last
+     * @param {!Object} changedProps Bag of properties changed since the last
      *   call to `_propertiesChanged`
-     * @param {?Object} oldProps Bag of previous values for each property
+     * @param {!Object} oldProps Bag of previous values for each property
      *   in `changedProps`
      * @return {void}
      * @protected
-     * @override
      */
     _propertiesChanged(currentProps, changedProps, oldProps) { // eslint-disable-line no-unused-vars
     }
@@ -548,7 +529,6 @@ const PropertiesChanged = dedupingMixin(
      * @return {boolean} Whether the property should be considered a change
      *   and enqueue a `_proeprtiesChanged` callback
      * @protected
-     * @override
      */
     _shouldPropertyChange(property, value, old) {
       return (
@@ -569,7 +549,6 @@ const PropertiesChanged = dedupingMixin(
      * @param {?string} namespace Attribute namespace.
      * @return {void}
      * @suppress {missingProperties} Super may or may not implement the callback
-     * @override
      */
     attributeChangedCallback(name, old, value, namespace) {
       if (old !== value) {
@@ -591,7 +570,6 @@ const PropertiesChanged = dedupingMixin(
      * @param {*=} type type to deserialize to, defaults to the value
      * returned from `typeForProperty`
      * @return {void}
-     * @override
      */
     _attributeToProperty(attribute, value, type) {
       if (!this.__serializing) {
@@ -611,7 +589,6 @@ const PropertiesChanged = dedupingMixin(
      * @param {string=} attribute Attribute name to reflect to.
      * @param {*=} value Property value to refect.
      * @return {void}
-     * @override
      */
     _propertyToAttribute(property, attribute, value) {
       this.__serializing = true;
@@ -633,7 +610,6 @@ const PropertiesChanged = dedupingMixin(
      * @param {*} value Value to serialize.
      * @param {string} attribute Attribute name to serialize to.
      * @return {void}
-     * @override
      */
     _valueToNodeAttribute(node, value, attribute) {
       const str = this._serializeValue(value);
@@ -654,7 +630,6 @@ const PropertiesChanged = dedupingMixin(
      * @param {*} value Property value to serialize.
      * @return {string | undefined} String serialized from the provided
      * property  value.
-     * @override
      */
     _serializeValue(value) {
       switch (typeof value) {
@@ -676,7 +651,6 @@ const PropertiesChanged = dedupingMixin(
      * @param {?string} value Value to deserialize.
      * @param {*=} type Type to deserialize the string to.
      * @return {*} Typed value deserialized from the provided string.
-     * @override
      */
     _deserializeValue(value, type) {
       switch (type) {
@@ -743,8 +717,8 @@ const PropertiesMixin = dedupingMixin(superClass => {
 
  /**
   * @constructor
+  * @extends {superClass}
   * @implements {Polymer_PropertiesChanged}
-  * @private
   */
  const base = PropertiesChanged(superClass);
 
@@ -753,7 +727,7 @@ const PropertiesMixin = dedupingMixin(superClass => {
   * instance of the PropertiesMixin.
   *
   * @param {!PropertiesMixinConstructor} constructor PropertiesMixin constructor
-  * @return {?PropertiesMixinConstructor} Super class constructor
+  * @return {PropertiesMixinConstructor} Super class constructor
   */
  function superPropertiesClass(constructor) {
    const superCtor = Object.getPrototypeOf(constructor);
@@ -763,7 +737,7 @@ const PropertiesMixin = dedupingMixin(superClass => {
    // because the mixin is deduped and guaranteed only to apply once, hence
    // all constructors in a proto chain will see the same `PropertiesMixin`
    return (superCtor.prototype instanceof PropertiesMixin) ?
-     /** @type {!PropertiesMixinConstructor} */ (superCtor) : null;
+     /** @type {PropertiesMixinConstructor} */ (superCtor) : null;
  }
 
  /**
@@ -815,7 +789,7 @@ const PropertiesMixin = dedupingMixin(superClass => {
     */
    static finalize() {
      if (!this.hasOwnProperty(JSCompiler_renameProperty('__finalized', this))) {
-       const superCtor = superPropertiesClass(/** @type {!PropertiesMixinConstructor} */(this));
+       const superCtor = superPropertiesClass(/** @type {PropertiesMixinConstructor} */(this));
        if (superCtor) {
          superCtor.finalize();
        }
@@ -832,7 +806,7 @@ const PropertiesMixin = dedupingMixin(superClass => {
     * @protected
     */
    static _finalizeClass() {
-     const props = ownProperties(/** @type {!PropertiesMixinConstructor} */(this));
+     const props = ownProperties(/** @type {PropertiesMixinConstructor} */(this));
      if (props) {
        this.createProperties(props);
      }
@@ -849,7 +823,7 @@ const PropertiesMixin = dedupingMixin(superClass => {
    static get _properties() {
      if (!this.hasOwnProperty(
        JSCompiler_renameProperty('__properties', this))) {
-       const superCtor = superPropertiesClass(/** @type {!PropertiesMixinConstructor} */(this));
+       const superCtor = superPropertiesClass(/** @type {PropertiesMixinConstructor} */(this));
        this.__properties = Object.assign({},
          superCtor && superCtor._properties,
          ownProperties(/** @type {PropertiesMixinConstructor} */(this)));
@@ -887,7 +861,6 @@ const PropertiesMixin = dedupingMixin(superClass => {
     * `PropertiesChanged`.
     * @suppress {missingProperties} Super may or may not implement the callback
     * @return {void}
-    * @override
     */
    connectedCallback() {
      if (super.connectedCallback) {
@@ -900,7 +873,6 @@ const PropertiesMixin = dedupingMixin(superClass => {
     * Called when the element is removed from a document
     * @suppress {missingProperties} Super may or may not implement the callback
     * @return {void}
-    * @override
     */
    disconnectedCallback() {
      if (super.disconnectedCallback) {
@@ -999,12 +971,61 @@ class SVGTemplateResult extends TemplateResult {
     }
 }
 /**
+ * The default TemplateFactory which caches Templates keyed on
+ * result.type and result.strings.
+ */
+function defaultTemplateFactory(result) {
+    let templateCache = templateCaches.get(result.type);
+    if (templateCache === undefined) {
+        templateCache = new Map();
+        templateCaches.set(result.type, templateCache);
+    }
+    let template = templateCache.get(result.strings);
+    if (template === undefined) {
+        template = new Template(result, result.getTemplateElement());
+        templateCache.set(result.strings, template);
+    }
+    return template;
+}
+/**
+ * Renders a template to a container.
+ *
+ * To update a container with new values, reevaluate the template literal and
+ * call `render` with the new result.
+ *
+ * @param result a TemplateResult created by evaluating a template tag like
+ *     `html` or `svg`.
+ * @param container A DOM parent to render to. The entire contents are either
+ *     replaced, or efficiently updated if the same result type was previous
+ *     rendered there.
+ * @param templateFactory a function to create a Template or retreive one from
+ *     cache.
+ */
+function render(result, container, templateFactory = defaultTemplateFactory) {
+    const template = templateFactory(result);
+    let instance = container.__templateInstance;
+    // Repeat render, just call update()
+    if (instance !== undefined && instance.template === template &&
+        instance._partCallback === result.partCallback) {
+        instance.update(result.values);
+        return;
+    }
+    // First render, create a new TemplateInstance and append it
+    instance =
+        new TemplateInstance(template, result.partCallback, templateFactory);
+    container.__templateInstance = instance;
+    const fragment = instance._clone();
+    instance.update(result.values);
+    removeNodes(container, container.firstChild);
+    container.appendChild(fragment);
+}
+/**
  * An expression marker with embedded unique key to avoid collision with
  * possible text in templates.
  */
 const marker = `{{lit-${String(Math.random()).slice(2)}}}`;
 /**
- * An expression marker used text-positions, not attribute positions,
+ * An expression marker used text-posisitions, not attribute positions,
  * in template.
  */
 const nodeMarker = `<!--${marker}-->`;
@@ -1072,7 +1093,6 @@ class TemplatePart {
         this.strings = strings;
     }
 }
-const isTemplatePartActive = (part) => part.index !== -1;
 /**
  * An updateable Template that tracks the location of dynamic parts.
  */
@@ -1113,7 +1133,7 @@ class Template {
                 }
                 while (count-- > 0) {
                     // Get the template literal section leading up to the first
-                    // expression in this attribute
+                    // expression in this attribute attribute
                     const stringForPart = result.strings[partIndex];
                     // Find the attribute name
                     const attributeNameInPart = lastAttributeNameRegex.exec(stringForPart)[1];
@@ -1203,7 +1223,7 @@ const getValue = (part, value) => {
     // so we convert it to undefined
     if (isDirective(value)) {
         value = value(part);
-        return noChange;
+        return directiveValue;
     }
     return value === null ? undefined : value;
 };
@@ -1212,7 +1232,7 @@ const isDirective = (o) => typeof o === 'function' && o.__litDirective === true;
  * A sentinel value that signals that a value was handled by a directive and
  * should not be written to the DOM.
  */
-const noChange = {};
+const directiveValue = {};
 const isPrimitiveValue = (value) => value === null ||
     !(typeof value === 'object' || typeof value === 'function');
 class AttributePart {
@@ -1231,7 +1251,7 @@ class AttributePart {
         for (let i = 0; i < l; i++) {
             text += strings[i];
             const v = getValue(this, values[startIndex + i]);
-            if (v && v !== noChange &&
+            if (v && v !== directiveValue &&
                 (Array.isArray(v) || typeof v !== 'string' && v[Symbol.iterator])) {
                 for (const t of v) {
                     // TODO: we need to recursively call getValue into iterables...
@@ -1270,7 +1290,7 @@ class AttributePart {
         else {
             value = this._interpolate(values, startIndex);
         }
-        if (value !== noChange) {
+        if (value !== directiveValue) {
             this.element.setAttribute(this.name, value);
         }
         this._previousValues = values;
@@ -1285,7 +1305,7 @@ class NodePart {
     }
     setValue(value) {
         value = getValue(this, value);
-        if (value === noChange) {
+        if (value === directiveValue) {
             return;
         }
         if (isPrimitiveValue(value)) {
@@ -1439,10 +1459,7 @@ class TemplateInstance {
     update(values) {
         let valueIndex = 0;
         for (const part of this._parts) {
-            if (!part) {
-                valueIndex++;
-            }
-            else if (part.size === undefined) {
+            if (part.size === undefined) {
                 part.setValue(values[valueIndex]);
                 valueIndex++;
             }
@@ -1453,10 +1470,7 @@ class TemplateInstance {
         }
     }
     _clone() {
-        // Clone the node, rather than importing it, to keep the fragment in the
-        // template's document. This leaves the fragment inert so custom elements
-        // won't upgrade until after the main document adopts the node.
-        const fragment = this.template.element.content.cloneNode(true);
+        const fragment = document.importNode(this.template.element.content, true);
         const parts = this.template.parts;
         if (parts.length > 0) {
             // Edge needs all 4 parameters present; IE11 needs 3rd parameter to be
@@ -1466,15 +1480,11 @@ class TemplateInstance {
             let index = -1;
             for (let i = 0; i < parts.length; i++) {
                 const part = parts[i];
-                const partActive = isTemplatePartActive(part);
-                // An inactive part has no coresponding Template node.
-                if (partActive) {
-                    while (index < part.index) {
-                        index++;
-                        walker.nextNode();
-                    }
+                while (index < part.index) {
+                    index++;
+                    walker.nextNode();
                 }
-                this._parts.push(partActive ? this._partCallback(this, part, walker.currentNode) : undefined);
+                this._parts.push(this._partCallback(this, part, walker.currentNode));
             }
         }
         return fragment;
@@ -1520,136 +1530,8 @@ const removeNodes = (container, startNode, endNode = null) => {
  * subject to an additional IP rights grant found at
  * http://polymer.github.io/PATENTS.txt
  */
-const walkerNodeFilter = NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_COMMENT |
-    NodeFilter.SHOW_TEXT;
-/**
- * Removes the list of nodes from a Template safely. In addition to removing
- * nodes from the Template, the Template part indices are updated to match
- * the mutated Template DOM.
- *
- * As the template is walked the removal state is tracked and
- * part indices are adjusted as needed.
- *
- * div
- *   div#1 (remove) <-- start removing (removing node is div#1)
- *     div
- *       div#2 (remove)  <-- continue removing (removing node is still div#1)
- *         div
- * div <-- stop removing since previous sibling is the removing node (div#1, removed 4 nodes)
- */
-function removeNodesFromTemplate(template, nodesToRemove) {
-    const { element: { content }, parts } = template;
-    const walker = document.createTreeWalker(content, walkerNodeFilter, null, false);
-    let partIndex = 0;
-    let part = parts[0];
-    let nodeIndex = -1;
-    let removeCount = 0;
-    const nodesToRemoveInTemplate = [];
-    let currentRemovingNode = null;
-    while (walker.nextNode()) {
-        nodeIndex++;
-        const node = walker.currentNode;
-        // End removal if stepped past the removing node
-        if (node.previousSibling === currentRemovingNode) {
-            currentRemovingNode = null;
-        }
-        // A node to remove was found in the template
-        if (nodesToRemove.has(node)) {
-            nodesToRemoveInTemplate.push(node);
-            // Track node we're removing
-            if (currentRemovingNode === null) {
-                currentRemovingNode = node;
-            }
-        }
-        // When removing, increment count by which to adjust subsequent part indices
-        if (currentRemovingNode !== null) {
-            removeCount++;
-        }
-        while (part !== undefined && part.index === nodeIndex) {
-            // If part is in a removed node deactivate it by setting index to -1 or
-            // adjust the index as needed.
-            part.index = currentRemovingNode !== null ? -1 : part.index - removeCount;
-            part = parts[++partIndex];
-        }
-    }
-    nodesToRemoveInTemplate.forEach((n) => n.parentNode.removeChild(n));
-}
-const countNodes = (node) => {
-    let count = 1;
-    const walker = document.createTreeWalker(node, walkerNodeFilter, null, false);
-    while (walker.nextNode()) {
-        count++;
-    }
-    return count;
-};
-const nextActiveIndexInTemplateParts = (parts, startIndex = -1) => {
-    for (let i = startIndex + 1; i < parts.length; i++) {
-        const part = parts[i];
-        if (isTemplatePartActive(part)) {
-            return i;
-        }
-    }
-    return -1;
-};
-/**
- * Inserts the given node into the Template, optionally before the given
- * refNode. In addition to inserting the node into the Template, the Template
- * part indices are updated to match the mutated Template DOM.
- */
-function insertNodeIntoTemplate(template, node, refNode = null) {
-    const { element: { content }, parts } = template;
-    // If there's no refNode, then put node at end of template.
-    // No part indices need to be shifted in this case.
-    if (refNode === null || refNode === undefined) {
-        content.appendChild(node);
-        return;
-    }
-    const walker = document.createTreeWalker(content, walkerNodeFilter, null, false);
-    let partIndex = nextActiveIndexInTemplateParts(parts);
-    let insertCount = 0;
-    let walkerIndex = -1;
-    while (walker.nextNode()) {
-        walkerIndex++;
-        const walkerNode = walker.currentNode;
-        if (walkerNode === refNode) {
-            refNode.parentNode.insertBefore(node, refNode);
-            insertCount = countNodes(node);
-        }
-        while (partIndex !== -1 && parts[partIndex].index === walkerIndex) {
-            // If we've inserted the node, simply adjust all subsequent parts
-            if (insertCount > 0) {
-                while (partIndex !== -1) {
-                    parts[partIndex].index += insertCount;
-                    partIndex = nextActiveIndexInTemplateParts(parts, partIndex);
-                }
-                return;
-            }
-            partIndex = nextActiveIndexInTemplateParts(parts, partIndex);
-        }
-    }
-}
-
-/**
- * @license
- * Copyright (c) 2017 The Polymer Project Authors. All rights reserved.
- * This code may only be used under the BSD style license found at
- * http://polymer.github.io/LICENSE.txt
- * The complete set of authors may be found at
- * http://polymer.github.io/AUTHORS.txt
- * The complete set of contributors may be found at
- * http://polymer.github.io/CONTRIBUTORS.txt
- * Code distributed by Google as part of the polymer project is also
- * subject to an additional IP rights grant found at
- * http://polymer.github.io/PATENTS.txt
- */
-// Get a key to lookup in `templateCaches`.
-const getTemplateCacheKey = (type, scopeName) => `${type}--${scopeName}`;
-/**
- * Template factory which scopes template DOM using ShadyCSS.
- * @param scopeName {string}
- */
 const shadyTemplateFactory = (scopeName) => (result) => {
-    const cacheKey = getTemplateCacheKey(result.type, scopeName);
+    const cacheKey = `${result.type}--${scopeName}`;
     let templateCache = templateCaches.get(cacheKey);
     if (templateCache === undefined) {
         templateCache = new Map();
@@ -1659,99 +1541,15 @@ const shadyTemplateFactory = (scopeName) => (result) => {
     if (template === undefined) {
         const element = result.getTemplateElement();
         if (typeof window.ShadyCSS === 'object') {
-            window.ShadyCSS.prepareTemplateDom(element, scopeName);
+            window.ShadyCSS.prepareTemplate(element, scopeName);
         }
         template = new Template(result, element);
         templateCache.set(result.strings, template);
     }
     return template;
 };
-const TEMPLATE_TYPES = ['html', 'svg'];
-/**
- * Removes all style elements from Templates for the given scopeName.
- */
-function removeStylesFromLitTemplates(scopeName) {
-    TEMPLATE_TYPES.forEach((type) => {
-        const templates = templateCaches.get(getTemplateCacheKey(type, scopeName));
-        if (templates !== undefined) {
-            templates.forEach((template) => {
-                const { element: { content } } = template;
-                const styles = content.querySelectorAll('style');
-                removeNodesFromTemplate(template, new Set(Array.from(styles)));
-            });
-        }
-    });
-}
-const shadyRenderSet = new Set();
-/**
- * For the given scope name, ensures that ShadyCSS style scoping is performed.
- * This is done just once per scope name so the fragment and template cannot
- * be modified.
- * (1) extracts styles from the rendered fragment and hands them to ShadyCSS
- * to be scoped and appended to the document
- * (2) removes style elements from all lit-html Templates for this scope name.
- *
- * Note, <style> elements can only be placed into templates for the
- * initial rendering of the scope. If <style> elements are included in templates
- * dynamically rendered to the scope (after the first scope render), they will
- * not be scoped and the <style> will be left in the template and rendered output.
- */
-const ensureStylesScoped = (fragment, template, scopeName) => {
-    // only scope element template once per scope name
-    if (!shadyRenderSet.has(scopeName)) {
-        shadyRenderSet.add(scopeName);
-        const styleTemplate = document.createElement('template');
-        Array.from(fragment.querySelectorAll('style')).forEach((s) => {
-            styleTemplate.content.appendChild(s);
-        });
-        window.ShadyCSS.prepareTemplateStyles(styleTemplate, scopeName);
-        // Fix templates: note the expectation here is that the given `fragment`
-        // has been generated from the given `template` which contains
-        // the set of templates rendered into this scope.
-        // It is only from this set of initial templates from which styles
-        // will be scoped and removed.
-        removeStylesFromLitTemplates(scopeName);
-        // ApplyShim case
-        if (window.ShadyCSS.nativeShadow) {
-            const style = styleTemplate.content.querySelector('style');
-            if (style !== null) {
-                // Insert style into rendered fragment
-                fragment.insertBefore(style, fragment.firstChild);
-                // Insert into lit-template (for subsequent renders)
-                insertNodeIntoTemplate(template, style.cloneNode(true), template.element.content.firstChild);
-            }
-        }
-    }
-};
-// NOTE: We're copying code from lit-html's `render` method here.
-// We're doing this explicitly because the API for rendering templates is likely
-// to change in the near term.
 function render$1(result, container, scopeName) {
-    const templateFactory = shadyTemplateFactory(scopeName);
-    const template = templateFactory(result);
-    let instance = container.__templateInstance;
-    // Repeat render, just call update()
-    if (instance !== undefined && instance.template === template &&
-        instance._partCallback === result.partCallback) {
-        instance.update(result.values);
-        return;
-    }
-    // First render, create a new TemplateInstance and append it
-    instance =
-        new TemplateInstance(template, result.partCallback, templateFactory);
-    container.__templateInstance = instance;
-    const fragment = instance._clone();
-    instance.update(result.values);
-    const host = container instanceof ShadowRoot ?
-        container.host :
-        undefined;
-    // If there's a shadow host, do ShadyCSS scoping...
-    if (host !== undefined && typeof window.ShadyCSS === 'object') {
-        ensureStylesScoped(fragment, template, scopeName);
-        window.ShadyCSS.styleElement(host);
-    }
-    removeNodes(container, container.firstChild);
-    container.appendChild(fragment);
+    return render(result, container, shadyTemplateFactory(scopeName));
 }
 
 /**
@@ -1831,7 +1629,7 @@ class BooleanAttributePart extends AttributePart {
         const s = this.strings;
         if (s.length === 2 && s[0] === '' && s[1] === '') {
             const value = getValue(this, values[startIndex]);
-            if (value === noChange) {
+            if (value === directiveValue) {
                 return;
             }
             if (value) {
@@ -1862,7 +1660,7 @@ class PropertyPart extends AttributePart {
             // Interpolation, so interpolate
             value = this._interpolate(values, startIndex);
         }
-        if (value !== noChange) {
+        if (value !== directiveValue) {
             this.element[this.name] = value;
         }
         this._previousValues = values;
@@ -1914,12 +1712,6 @@ class LitElement extends PropertiesMixin(HTMLElement) {
         super.ready();
         this._firstRendered();
     }
-    connectedCallback() {
-        if (window.ShadyCSS && this._root) {
-            window.ShadyCSS.styleElement(this);
-        }
-        super.connectedCallback();
-    }
     /**
      * Called after the element DOM is rendered for the first time.
      * Implement to perform tasks after first rendering like capturing a
@@ -1942,7 +1734,7 @@ class LitElement extends PropertiesMixin(HTMLElement) {
      * Override which returns the value of `_shouldRender` which users
      * should implement to control rendering. If this method returns false,
      * _propertiesChanged will not be called and no rendering will occur even
-     * if property values change or `requestRender` is called.
+     * if property values change or `_requestRender` is called.
      * @param _props Current element properties
      * @param _changedProps Changing element properties
      * @param _prevProps Previous element properties
@@ -1957,7 +1749,7 @@ class LitElement extends PropertiesMixin(HTMLElement) {
     }
     /**
      * Implement to control if rendering should occur when property values
-     * change or `requestRender` is called. By default, this method always
+     * change or `_requestRender` is called. By default, this method always
      * returns true, but this can be customized as an optimization to avoid
      * rendering work when changes occur which should not be rendered.
      * @param _props Current element properties
@@ -1999,7 +1791,6 @@ class LitElement extends PropertiesMixin(HTMLElement) {
      * @param value {any}
      * @param old {any}
      */
-    // tslint:disable-next-line no-any
     _shouldPropertyChange(property, value, old) {
         const change = super._shouldPropertyChange(property, value, old);
         if (change && this.__isChanging) {
@@ -2012,10 +1803,10 @@ class LitElement extends PropertiesMixin(HTMLElement) {
     /**
      * Implement to describe the DOM which should be rendered in the element.
      * Ideally, the implementation is a pure function using only props to describe
-     * the element template. The implementation must return a `lit-html`
-     * TemplateResult. By default this template is rendered into the element's
-     * shadowRoot. This can be customized by implementing `_createRoot`. This
-     * method must be implemented.
+     * the element template. The implementation must a `lit-html` TemplateResult.
+     * By default this template is rendered into the element's shadowRoot.
+     * This can be customized by implementing `_createRoot`. This method must be
+     * implemented.
      * @param {*} _props Current element properties
      * @returns {TemplateResult} Must return a lit-html TemplateResult.
      */
@@ -2047,7 +1838,7 @@ class LitElement extends PropertiesMixin(HTMLElement) {
      * Call to request the element to asynchronously re-render regardless
      * of whether or not any property changes are pending.
      */
-    requestRender() { this._invalidateProperties(); }
+    _requestRender() { this._invalidateProperties(); }
     /**
      * Override which provides tracking of invalidated state.
      */
@@ -2069,10 +1860,11 @@ class LitElement extends PropertiesMixin(HTMLElement) {
     get renderComplete() {
         if (!this.__renderComplete) {
             this.__renderComplete = new Promise((resolve) => {
-                this.__resolveRenderComplete = (value) => {
-                    this.__resolveRenderComplete = this.__renderComplete = null;
-                    resolve(value);
-                };
+                this.__resolveRenderComplete =
+                    (value) => {
+                        this.__resolveRenderComplete = this.__renderComplete = null;
+                        resolve(value);
+                    };
             });
             if (!this.__isInvalid && this.__resolveRenderComplete) {
                 Promise.resolve().then(() => this.__resolveRenderComplete(false));
