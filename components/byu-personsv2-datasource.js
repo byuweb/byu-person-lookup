@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as personsv2Source from './personsv2LookupDataSource'
+import * as personsv2Source from '../lib/personsv2LookupDataSource'
 import {LitElement, html} from '@polymer/lit-element'
 
 const {CustomEvent} = window
