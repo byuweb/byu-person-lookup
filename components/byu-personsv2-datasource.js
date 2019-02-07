@@ -21,7 +21,12 @@ const {CustomEvent} = window
 
 const executePersonsv2Request = async (search, target, pageLink) => {
   try {
-    const {next, prev, people} = await personsv2Source.search(search, pageLink)
+    const results = await personsv2Source.search(search, pageLink)
+    if (!results) {
+      console.error('results is null or undefined!')
+      return {}
+    }
+    const {next, prev, people} = results
     target.dispatchEvent(new CustomEvent('byu-lookup-datasource-result', {
       bubbles: true,
       detail: people
@@ -33,6 +38,7 @@ const executePersonsv2Request = async (search, target, pageLink) => {
       bubbles: true,
       detail: err
     }))
+    return {}
   }
 }
 
@@ -77,9 +83,12 @@ class ByuPersonsv2Datasource extends LitElement {
     }
     this.timeout = setTimeout(async () => {
       setPendingSearch(this)
-      const {next, prev} = await executePersonsv2Request(this.search, this)
-      this.next = next
-      this.prev = prev
+      const results = await executePersonsv2Request(this.search, this) || {}
+      if (results) {
+        const {next, prev} = results
+        this.next = next
+        this.prev = prev
+      }
     }, 100)
   }
 
@@ -90,9 +99,12 @@ class ByuPersonsv2Datasource extends LitElement {
     this.timeout = setTimeout(async () => {
       if (this.next) {
         setPendingSearch(this)
-        const {next, prev} = await executePersonsv2Request(this.search, this, this.next)
-        this.next = next
-        this.prev = prev
+        const results = await executePersonsv2Request(this.search, this, this.next) || {}
+        if (results) {
+          const {next, prev} = results
+          this.next = next
+          this.prev = prev
+        }
       }
     }, 100)
   }
@@ -104,7 +116,8 @@ class ByuPersonsv2Datasource extends LitElement {
     this.timeout = setTimeout(async () => {
       if (this.prev) {
         setPendingSearch(this)
-        const {next, prev} = await executePersonsv2Request(this.search, this, this.prev)
+        const results = await executePersonsv2Request(this.search, this, this.prev) || {}
+        const {next, prev} = results
         this.next = next
         this.prev = prev
       }
