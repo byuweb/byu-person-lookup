@@ -18,22 +18,38 @@ import {LitElement, html} from '@polymer/lit-element'
 import {svg} from 'lit-html/lib/lit-extended'
 import faSearch from '@fortawesome/fontawesome-free-solid/faSearch'
 import faSpinner from '@fortawesome/fontawesome-free-solid/faSpinner'
+import faBan from '@fortawesome/fontawesome-free-solid/faBan'
+import faExclamationTriangle from '@fortawesome/fontawesome-free-solid/faExclamationTriangle'
 import ByuPersonLookupResults from './byu-person-lookup-results'
 
 export default class ByuPersonLookup extends LitElement {
   static get properties () {
     return {
-      search: String,
+      context: String,
+      errorMessage: String,
+      errorType: String,
       results: Object,
-      searchPending: Boolean,
-      context: String
+      search: String,
+      searchPending: Boolean
     }
   }
 
+  constructor () {
+    super()
+    this.context = 'directory'
+    this.errorMessage = ''
+    this.errorType = ''
+    this.results = null
+    this.search = ''
+    this.searchPending = false
+  }
+
   _render ({search, results, searchPending, context}) {
-    console.log(`search=${search}, context=${context}`)
+    // console.log(`search=${search}, context=${context}`)
     const [, , , , searchIconPath] = faSearch.icon
     const [, , , , spinIconPath] = faSpinner.icon
+    const [, , , , banIconPath] = faBan.icon
+    const [, , , , warnIconPath] = faExclamationTriangle.icon
     const css = html`
       <style>
         :host {
@@ -48,6 +64,9 @@ export default class ByuPersonLookup extends LitElement {
         div {
           position: relative;
           padding: 1rem;
+        }
+        .small-padding {
+          padding: 0.25rem;
         }
         label {
           position: absolute;
@@ -80,6 +99,23 @@ export default class ByuPersonLookup extends LitElement {
         .spin {
           animation: spin 1500ms linear infinite;
         }
+        .container {
+          position: relative;
+        }
+        .hidden {
+          display: none;
+        }
+        .error-display {
+          background-color: rgba(179, 4, 26, 0.8);
+          color: white;
+          position: absolute;
+          top: 3.7rem;
+          box-shadow: 0rem 0.1rem 0.1rem rgba(0, 0, 0, 0.2);
+        }
+        .error-handle {
+          position: absolute;
+          top: -10px;
+        }
         @keyframes spin {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
@@ -100,7 +136,7 @@ export default class ByuPersonLookup extends LitElement {
 
     return html`
     ${css}
-    <div>
+    <div class="container">
       <label for="search">
         <slot>
           No Data Provider
@@ -129,6 +165,27 @@ export default class ByuPersonLookup extends LitElement {
           ${this.searchPending ? 'Searching' : 'Search'}
         </span>
       </button>
+      <slot name="error">
+        <div class$="${this.errorType === '' ? 'hidden' : 'error-display'}">
+          <svg class="error-handle" width="10" height="10" viewBox="0 0 100 100">
+            <path d="M50,0 L100,100 L0,100 Z" fill="rgba(179, 4, 26, 0.8)">
+          </svg>
+          <svg alt="${this.errorType}" width="14" height="14" viewBox="0 0 578 512">
+          ${svg`
+            <path
+              d$="${this.errorType === "No Results" ? banIconPath : warnIconPath}"
+              fill="white"
+            />
+          `}
+          </svg>
+          ${
+            this.errorType === "No Results" ?
+              this.errorMessage
+              :
+              html`Oops! Something went wrong. <div class="small-padding"><small>${this.errorMessage}</small></div>`
+          }
+        </div>
+      </slot>
     </div>
     <slot name="results">
       <byu-person-lookup-results
@@ -175,7 +232,7 @@ export default class ByuPersonLookup extends LitElement {
 
   searchResults (e) {
     e.stopPropagation() // Don't trigger any other lookup components
-    // console.log('search results:\n', e.detail)
+    console.log('search results:\n', e.detail)
     /*
     this.results = Array.isArray(this.results)
     ? this.results.length > 120
@@ -183,14 +240,21 @@ export default class ByuPersonLookup extends LitElement {
     : this.results
     : []
     */
-    this.results = this.results.concat(e.detail)
     this.searchPending = false
+    if (e.detail.length === 0 && this.results.length === 0) {
+      this.errorMessage = 'Hmmm, we couldn\'t find anyone.'
+      this.errorType = 'No Results'
+      return
+    }
+    this.results = this.results.concat(e.detail)
   }
 
   searchError (e) {
     e.stopPropagation() // Don't trigger any other lookup components
     this.searchPending = false
-    window.alert(e.detail)
+    // window.alert(e.detail)
+    this.errorMessage = e.detail
+    this.errorType = 'Service Error'
     console.error('search error:\n', e.detail)
   }
 
@@ -200,6 +264,8 @@ export default class ByuPersonLookup extends LitElement {
   }
 
   searchChange (e) {
+    this.errorMessage = ''
+    this.errorType = ''
     this.search = e.target.value
     // console.log(`search=${this.search}`)
     if (this.__lookupProvider) {
@@ -210,8 +276,12 @@ export default class ByuPersonLookup extends LitElement {
 
   doSearch () {
     // console.log(`doSearch:search: ${this.search}`)
+    this.errorMessage = ''
+    this.errorType = ''
     this.results = []
-    this.fetchFromProvider(this.search)
+    if (this.search.length > 0) {
+      this.fetchFromProvider(this.search)
+    }
   }
 
   loadNextPage () {
