@@ -2107,7 +2107,11 @@ class ByuPersonLookupResults extends LitElement {
     `);
 
     const renderEmployeeInfo = row => {
-      if (/ACT|LEV/.test(row.employeeType)) {
+      if (
+        /ACT|LEV/.test(row.employeeType) ||
+        (row.employeeType === '' && row.jobTitle && row.department)
+      ) {
+        console.log('render employee');
         return html$1`
           <div>
             <div>${row.jobTitle}</div>
@@ -2116,6 +2120,7 @@ class ByuPersonLookupResults extends LitElement {
           </div>
         `
       }
+      console.log('no render employee');
       return html$1`<div></div>`
     };
 
