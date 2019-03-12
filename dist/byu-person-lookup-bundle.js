@@ -2228,7 +2228,10 @@ class ByuPersonLookupResults extends LitElement {
   static get styles () {
     return [css`
       :host {
-        padding: 1rem;
+        display: block;
+      }
+      :host[hidden] {
+        display: none;
       }
       * {
         font-family: 'HCo Ringside Narrow SSm', Arial Narrow, Arial, sans-serif;
@@ -2236,7 +2239,7 @@ class ByuPersonLookupResults extends LitElement {
       .modal {
         z-index: 98;
         background-color: rgba(0, 0, 0, 0.6);
-        position: absolute;
+        position: fixed;
         left: 0;
         right: 0;
         top: 0;
@@ -2244,7 +2247,7 @@ class ByuPersonLookupResults extends LitElement {
       }
       .results {
         z-index: 99;
-        position: absolute;
+        position: fixed;
         left: 0;
         right: 0;
         top: 20vh;
@@ -2259,7 +2262,7 @@ class ByuPersonLookupResults extends LitElement {
       }
       .close-modal {
         z-index: 100;
-        position: absolute;
+        position: fixed;
         right: 0;
         top: calc(20vh - 2rem);
         border-radius: 50%;
@@ -2652,19 +2655,40 @@ class ByuPersonLookup extends LitElement {
       css` div { position: relative; padding: 1rem; } `,
       css` .small-padding { padding: 0.25rem; } `,
       css` label { position: absolute; left: 1rem; top: -0.1rem; font-size: 0.7rem; color: #999; } `,
-      css` input[type="search"] { padding: 0.3rem; border: thin solid #666666; border-radius: 0.2rem; margin-right: 0.2rem; min-width: 15rem; font-size: 1.1rem; } `,
-      css` button { padding: 0.3rem 1rem; border: thin solid #666666; border-radius: 0.05rem; background-color: #0057B8; color: white; cursor: pointer; } `,
+      css` input[type="search"] {
+        padding: 0.3rem;
+        border: thin solid #666666;
+        border-radius: 0.2rem;
+        margin-right: 0.2rem;
+        min-width: 15rem;
+        font-size: 1.1rem;
+      } `,
+      css` button {
+        padding: 0.3rem 1rem;
+        border: thin solid #666666;
+        border-radius: 0.05rem;
+        background-color: #0057B8;
+        color: white;
+        cursor: pointer;
+        font-size: 1.1rem;
+      } `,
       css` button:hover, button:active { box-shadow: inset 0 0 0.2rem rgba(255, 255, 255, 0.5); background-color: #5199E1; } `,
       css` .spin { animation: spin 1500ms linear infinite; } `,
       css` .container { position: relative; font-size: 1.1rem; } `,
       css` .hidden { display: none; } `,
-      css` .error-display { background-color: rgba(179, 4, 26, 0.8); color: white; position: absolute; top: 3.7rem; box-shadow: 0rem 0.1rem 0.1rem rgba(0, 0, 0, 0.2); } `,
+      css` .error-display {
+        background-color: rgba(179, 4, 26, 0.8);
+        color: white;
+        position: absolute;
+        top: 3.7rem;
+        box-shadow: 0rem 0.1rem 0.1rem rgba(0, 0, 0, 0.2);
+      } `,
       css` .error-handle { position: absolute; top: -10px; } `,
       css` @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } } .search-btn-label { display: none; } `,
       css` .compact { display: flex; padding: 0; }`,
       css` .compact > label { position: static; font-size: 0.9rem; align-self: center; } `,
       css` .compact > input[type="search"] { border-radius: 0; margin-right: 0; min-width: 10rem; font-size: 0.9rem; }`,
-      css` .compact > button { border-radius: 0; }`,
+      css` .compact > button { border-radius: 0; font-size: 0.9rem; }`,
       css` .compact > button .search-btn-label { display: none; } `,
       css` @media not speech { .sr-only { display: none; } } `,
       css` @media only screen and (min-width: 470px) { .search-btn-label { display: inline-block; } } `
@@ -2743,6 +2767,7 @@ class ByuPersonLookup extends LitElement {
     </div>
     <slot name="results">
       <byu-person-lookup-results
+        class=${results && results.length > 0 ? '' : 'hidden'}
         .results=${results}
         .context=${context}
         .searchPending=${this.searchPending}

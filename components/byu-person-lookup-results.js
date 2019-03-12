@@ -34,7 +34,10 @@ export default class ByuPersonLookupResults extends LitElement {
   static get styles () {
     return [css`
       :host {
-        padding: 1rem;
+        display: block;
+      }
+      :host[hidden] {
+        display: none;
       }
       * {
         font-family: 'HCo Ringside Narrow SSm', Arial Narrow, Arial, sans-serif;
@@ -42,7 +45,7 @@ export default class ByuPersonLookupResults extends LitElement {
       .modal {
         z-index: 98;
         background-color: rgba(0, 0, 0, 0.6);
-        position: absolute;
+        position: fixed;
         left: 0;
         right: 0;
         top: 0;
@@ -50,7 +53,7 @@ export default class ByuPersonLookupResults extends LitElement {
       }
       .results {
         z-index: 99;
-        position: absolute;
+        position: fixed;
         left: 0;
         right: 0;
         top: 20vh;
@@ -65,7 +68,7 @@ export default class ByuPersonLookupResults extends LitElement {
       }
       .close-modal {
         z-index: 100;
-        position: absolute;
+        position: fixed;
         right: 0;
         top: calc(20vh - 2rem);
         border-radius: 50%;
