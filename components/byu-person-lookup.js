@@ -50,7 +50,7 @@ class ByuPersonLookup extends LitElement {
       css` .error-display { background-color: rgba(179, 4, 26, 0.8); color: white; position: absolute; top: 3.7rem; box-shadow: 0rem 0.1rem 0.1rem rgba(0, 0, 0, 0.2); } `,
       css` .error-handle { position: absolute; top: -10px; } `,
       css` @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } } .search-btn-label { display: none; } `,
-      css` .compact { display: flex; }`,
+      css` .compact { display: flex; padding: 0; }`,
       css` .compact > label { position: static; font-size: 0.9rem; align-self: center; } `,
       css` .compact > input[type="search"] { border-radius: 0; margin-right: 0; min-width: 10rem; font-size: 0.9rem; }`,
       css` .compact > button { border-radius: 0; }`,

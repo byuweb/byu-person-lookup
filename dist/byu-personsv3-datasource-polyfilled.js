@@ -84,6 +84,7 @@
 //
 })({
     polyfills: 'https://cdn.byu.edu/web-component-polyfills/latest/polyfills.min.js',
-    bundle: 'https://cdn.byu.edu/byu-person-lookup/latest/byu-personsv3-datasource-bundle.min.js',
+    bundle: 'https://cdn.byu.edu/byu-person-lookup/latest/byu-personsv3-datasource-bundle.js',
     compatBundle: ''
+});
 });
