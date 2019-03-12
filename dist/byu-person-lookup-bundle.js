@@ -2352,13 +2352,14 @@ class ByuPersonLookupResults extends LitElement {
       }
       .card.placeholder { cursor: default; }
       svg.placeholder { filter: blur(1px); width: 18rem; height: 6rem; }
-      svg.placeholder line {
+      tr.placeholder svg.placeholder { width: 100%; max-height: 1rem; }
+      svg.placeholder rect {
         animation: pulse 1000ms ease-in-out infinite alternate;
       }
       @keyframes pulse {
-        from { stroke: #999999; }
-        70% { stroke: #999999; }
-        to { stroke: #B3B5B7; }
+        from { fill: #999999; }
+        70% { fill: #999999; }
+        to { fill: #B3B5B7; }
       }
       @media only screen and (min-width: 650px) {
         .deck {
@@ -2438,16 +2439,13 @@ class ByuPersonLookupResults extends LitElement {
     }
   }
 
-  firstUpdated () {
-  }
-
   render () {
     // console.log(`byu-person-lookup-results::_render::searchPending=${searchPending}`)
 
     const renderPlaceholderRows = () => [1, 2, 3, 4, 5, 6].map(() => html`
       <tr class="placeholder"><td colspan="5">
-        <svg class="placeholder" viewBox="0 0 100 3" preserveAspectRatio="none">
-          ${svg`<line x1="5" x2="95" y1="1.5" y2="1.5" stroke="#666666" />`}
+        <svg class="placeholder" viewBox="0 0 100 5" preserveAspectRatio="none">
+          ${svg`<rect x="1" y="1" width="98" height="3" fill="#999999"></rect>`}
         </svg>
       </td></tr>
     `);
@@ -2654,7 +2652,7 @@ class ByuPersonLookup extends LitElement {
       css` div { position: relative; padding: 1rem; } `,
       css` .small-padding { padding: 0.25rem; } `,
       css` label { position: absolute; left: 1rem; top: -0.1rem; font-size: 0.7rem; color: #999; } `,
-      css` input[type="search"] { padding: 0.3rem; border: thin solid #666666; border-radius: 0.2rem; margin-right: 0.2rem; min-width: 15rem; } `,
+      css` input[type="search"] { padding: 0.3rem; border: thin solid #666666; border-radius: 0.2rem; margin-right: 0.2rem; min-width: 15rem; font-size: 1.1rem; } `,
       css` button { padding: 0.3rem 1rem; border: thin solid #666666; border-radius: 0.05rem; background-color: #0057B8; color: white; cursor: pointer; } `,
       css` button:hover, button:active { box-shadow: inset 0 0 0.2rem rgba(255, 255, 255, 0.5); background-color: #5199E1; } `,
       css` .spin { animation: spin 1500ms linear infinite; } `,
@@ -2665,7 +2663,7 @@ class ByuPersonLookup extends LitElement {
       css` @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } } .search-btn-label { display: none; } `,
       css` .compact { display: flex; }`,
       css` .compact > label { position: static; font-size: 0.9rem; align-self: center; } `,
-      css` .compact > input[type="search"] { border-radius: 0; margin-right: 0; min-width: 10rem; }`,
+      css` .compact > input[type="search"] { border-radius: 0; margin-right: 0; min-width: 10rem; font-size: 0.9rem; }`,
       css` .compact > button { border-radius: 0; }`,
       css` .compact > button .search-btn-label { display: none; } `,
       css` @media not speech { .sr-only { display: none; } } `,

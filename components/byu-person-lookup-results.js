@@ -158,13 +158,14 @@ export default class ByuPersonLookupResults extends LitElement {
       }
       .card.placeholder { cursor: default; }
       svg.placeholder { filter: blur(1px); width: 18rem; height: 6rem; }
-      svg.placeholder line {
+      tr.placeholder svg.placeholder { width: 100%; max-height: 1rem; }
+      svg.placeholder rect {
         animation: pulse 1000ms ease-in-out infinite alternate;
       }
       @keyframes pulse {
-        from { stroke: #999999; }
-        70% { stroke: #999999; }
-        to { stroke: #B3B5B7; }
+        from { fill: #999999; }
+        70% { fill: #999999; }
+        to { fill: #B3B5B7; }
       }
       @media only screen and (min-width: 650px) {
         .deck {
@@ -244,16 +245,13 @@ export default class ByuPersonLookupResults extends LitElement {
     }
   }
 
-  firstUpdated () {
-  }
-
   render () {
     // console.log(`byu-person-lookup-results::_render::searchPending=${searchPending}`)
 
     const renderPlaceholderRows = () => [1, 2, 3, 4, 5, 6].map(() => html`
       <tr class="placeholder"><td colspan="5">
-        <svg class="placeholder" viewBox="0 0 100 3" preserveAspectRatio="none">
-          ${svg`<line x1="5" x2="95" y1="1.5" y2="1.5" stroke="#666666" />`}
+        <svg class="placeholder" viewBox="0 0 100 5" preserveAspectRatio="none">
+          ${svg`<rect x="1" y="1" width="98" height="3" fill="#999999"></rect>`}
         </svg>
       </td></tr>
     `)
