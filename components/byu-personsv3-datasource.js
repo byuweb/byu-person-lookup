@@ -15,18 +15,18 @@
  */
 
 import * as personsv3Source from '../lib/personsv3LookupDataSource'
-import {LitElement, html} from '@polymer/lit-element'
+import { LitElement, html } from '@polymer/lit-element'
 
-const {CustomEvent} = window
+const { CustomEvent } = window
 
 const executePersonsv3Request = async (search, target, pageLink) => {
   try {
-    const {next, prev, people} = await personsv3Source.search(search, pageLink)
+    const { next, prev, people } = await personsv3Source.search(search, pageLink)
     target.dispatchEvent(new CustomEvent('byu-lookup-datasource-result', {
       bubbles: true,
       detail: people
     }))
-    return {next, prev}
+    return { next, prev }
   } catch (err) {
     console.error(err)
     target.dispatchEvent(new CustomEvent('byu-lookup-datasource-error', {
@@ -38,7 +38,7 @@ const executePersonsv3Request = async (search, target, pageLink) => {
 
 const setPendingSearch = (target) => {
   const evtType = 'byu-lookup-datasource-searching'
-  const evt = new CustomEvent(evtType, {bubbles: true})
+  const evt = new CustomEvent(evtType, { bubbles: true })
   target.dispatchEvent(evt)
 }
 
@@ -46,7 +46,7 @@ class ByuPersonsv3Datasource extends LitElement {
   connectedCallback () {
     super.connectedCallback()
     personsv3Source.connect()
-    const evt = new CustomEvent('byu-lookup-datasource-register', {bubbles: true})
+    const evt = new CustomEvent('byu-lookup-datasource-register', { bubbles: true })
     this.dispatchEvent(evt)
   }
 
@@ -57,17 +57,17 @@ class ByuPersonsv3Datasource extends LitElement {
 
   static get properties () {
     return {
-      search: String,
-      next: String,
-      prev: String
+      search: { type: String },
+      next: { type: String },
+      prev: { type: String }
     }
   }
 
-  _render ({search}) {
-    if (!search) {
-      search = ''
+  render () {
+    if (!this.search) {
+      this.search = ''
     }
-    const {label} = personsv3Source.resolveSearchType(search)
+    const { label } = personsv3Source.resolveSearchType(this.search)
     return html`${label}`
   }
 
@@ -77,7 +77,7 @@ class ByuPersonsv3Datasource extends LitElement {
     }
     this.timeout = setTimeout(async () => {
       setPendingSearch(this)
-      const {next, prev} = await executePersonsv3Request(this.search, this)
+      const { next, prev } = await executePersonsv3Request(this.search, this)
       this.next = next
       this.prev = prev
     }, 100)
@@ -90,7 +90,7 @@ class ByuPersonsv3Datasource extends LitElement {
     this.timeout = setTimeout(async () => {
       if (this.next) {
         setPendingSearch(this)
-        const {next, prev} = await executePersonsv3Request(this.search, this, this.next)
+        const { next, prev } = await executePersonsv3Request(this.search, this, this.next)
         this.next = next
         this.prev = prev
       }
@@ -104,7 +104,7 @@ class ByuPersonsv3Datasource extends LitElement {
     this.timeout = setTimeout(async () => {
       if (this.prev) {
         setPendingSearch(this)
-        const {next, prev} = await executePersonsv3Request(this.search, this, this.prev)
+        const { next, prev } = await executePersonsv3Request(this.search, this, this.prev)
         this.next = next
         this.prev = prev
       }

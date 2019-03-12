@@ -25,8 +25,7 @@
   "dependencies": {
     "@byuweb/browser-oauth": "^0.3.1",
     "@fortawesome/fontawesome-free-solid": "^5.0.13",
-    "@polymer/lit-element": "^0.5.2",
-    "lit-html": "^0.10.2",
+    "@polymer/lit-element": "^0.7.1",
     "lodash.get": "^4.4.2"
   },
   "devDependencies": {

@@ -12,14 +12,14 @@
         #content { flex: 1; padding: 0.5rem; }
     </style>
 
+    <!--
     <script type="module" src="https://cdn.byu.edu/byu-person-lookup/latest/byu-person-lookup-bundle.min.js"></script>
     <script type="module" src="https://cdn.byu.edu/byu-person-lookup/latest/byu-personsv2-datasource-bundle.min.js"></script>
     <script type="module" src="https://cdn.byu.edu/byu-person-lookup/latest/byu-personsv3-datasource-bundle.min.js"></script>
-    <!--
+    -->
     <script type="module" src="../dist/byu-person-lookup-bundle.js"></script>
     <script type="module" src="../dist/byu-personsv2-datasource-bundle.js"></script>
     <script type="module" src="../dist/byu-personsv3-datasource-bundle.js"></script>
-    -->
 </head>
 <body>
     <byu-header>
@@ -29,12 +29,12 @@
     <div id="content">
 
         <h2>PersonsV3 Lookup</h2>
-        <byu-person-lookup id="lookup-2" context="directory">
+        <byu-person-lookup id="lookup-3" context="directory">
             <byu-personsv3-datasource></byu-personsv3-datasource>
         </byu-person-lookup>
 
         <h2>PersonsV2 Lookup</h2>
-        <byu-person-lookup id="lookup-3" context="directory">
+        <byu-person-lookup id="lookup-2" context="directory">
             <byu-personsv2-datasource></byu-personsv2-datasource>
         </byu-person-lookup>
 
@@ -45,6 +45,8 @@
                 <option value="directory">Directory</option>
                 <option value="admin">Admin</option>
             </select>
+            <label for="searchCompact">Compact View</label>
+            <input type="checkbox" id="searchCompact">
         </div>
         <div>
             <h1>Test Authentication (from WSO2)</h1>
@@ -122,6 +124,17 @@
             const val = e.target.value
             document.getElementById('lookup-2').setAttribute('context', val)
             document.getElementById('lookup-3').setAttribute('context', val)
+        })
+
+        document.getElementById('searchCompact').addEventListener('change', e => {
+            const val = e.target.checked
+            if (val) {
+                document.getElementById('lookup-2').setAttribute('compact', '')
+                document.getElementById('lookup-3').setAttribute('compact', '')
+            } else {
+                document.getElementById('lookup-2').removeAttribute('compact')
+                document.getElementById('lookup-3').removeAttribute('compact')
+            }
         })
     </script>
 </body>

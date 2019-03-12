@@ -15,9 +15,9 @@
  */
 
 import * as personsv2Source from '../lib/personsv2LookupDataSource'
-import {LitElement, html} from '@polymer/lit-element'
+import { LitElement, html } from '@polymer/lit-element'
 
-const {CustomEvent} = window
+const { CustomEvent } = window
 
 const executePersonsv2Request = async (search, target, pageLink) => {
   try {
@@ -26,12 +26,12 @@ const executePersonsv2Request = async (search, target, pageLink) => {
       console.error('results is null or undefined!')
       return {}
     }
-    const {next, prev, people} = results
+    const { next, prev, people } = results
     target.dispatchEvent(new CustomEvent('byu-lookup-datasource-result', {
       bubbles: true,
       detail: people
     }))
-    return {next, prev}
+    return { next, prev }
   } catch (err) {
     console.error(err)
     target.dispatchEvent(new CustomEvent('byu-lookup-datasource-error', {
@@ -44,7 +44,7 @@ const executePersonsv2Request = async (search, target, pageLink) => {
 
 const setPendingSearch = (target) => {
   const evtType = 'byu-lookup-datasource-searching'
-  const evt = new CustomEvent(evtType, {bubbles: true})
+  const evt = new CustomEvent(evtType, { bubbles: true })
   target.dispatchEvent(evt)
 }
 
@@ -52,7 +52,7 @@ class ByuPersonsv2Datasource extends LitElement {
   connectedCallback () {
     super.connectedCallback()
     personsv2Source.connect()
-    const evt = new CustomEvent('byu-lookup-datasource-register', {bubbles: true})
+    const evt = new CustomEvent('byu-lookup-datasource-register', { bubbles: true })
     this.dispatchEvent(evt)
   }
 
@@ -63,17 +63,17 @@ class ByuPersonsv2Datasource extends LitElement {
 
   static get properties () {
     return {
-      search: String,
-      next: String,
-      prev: String
+      search: { type: String },
+      next: { type: String },
+      prev: { type: String }
     }
   }
 
-  _render ({search}) {
-    if (!search) {
-      search = ''
+  render () {
+    if (!this.search) {
+      this.search = ''
     }
-    const {label} = personsv2Source.resolveSearchType(search)
+    const { label } = personsv2Source.resolveSearchType(this.search)
     return html`${label}`
   }
 
@@ -85,7 +85,7 @@ class ByuPersonsv2Datasource extends LitElement {
       setPendingSearch(this)
       const results = await executePersonsv2Request(this.search, this) || {}
       if (results) {
-        const {next, prev} = results
+        const { next, prev } = results
         this.next = next
         this.prev = prev
       }
@@ -101,7 +101,7 @@ class ByuPersonsv2Datasource extends LitElement {
         setPendingSearch(this)
         const results = await executePersonsv2Request(this.search, this, this.next) || {}
         if (results) {
-          const {next, prev} = results
+          const { next, prev } = results
           this.next = next
           this.prev = prev
         }
@@ -117,7 +117,7 @@ class ByuPersonsv2Datasource extends LitElement {
       if (this.prev) {
         setPendingSearch(this)
         const results = await executePersonsv2Request(this.search, this, this.prev) || {}
-        const {next, prev} = results
+        const { next, prev } = results
         this.next = next
         this.prev = prev
       }

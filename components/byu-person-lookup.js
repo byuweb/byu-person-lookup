@@ -14,29 +14,56 @@
  * limitations under the License.
  */
 
-import {LitElement, html} from '@polymer/lit-element'
-import {svg} from 'lit-html/lib/lit-extended'
+import { LitElement, html, css, svg } from '@polymer/lit-element'
 import faSearch from '@fortawesome/fontawesome-free-solid/faSearch'
 import faSpinner from '@fortawesome/fontawesome-free-solid/faSpinner'
 import faBan from '@fortawesome/fontawesome-free-solid/faBan'
 import faExclamationTriangle from '@fortawesome/fontawesome-free-solid/faExclamationTriangle'
 import ByuPersonLookupResults from './byu-person-lookup-results'
 
-export default class ByuPersonLookup extends LitElement {
+class ByuPersonLookup extends LitElement {
   static get properties () {
     return {
-      context: String,
-      errorMessage: String,
-      errorType: String,
-      results: Object,
-      search: String,
-      searchPending: Boolean
+      context: { type: String, reflect: true },
+      compact: { type: Boolean },
+      errorMessage: { type: String },
+      errorType: { type: String },
+      results: { type: Array, attribute: false },
+      search: { type: String },
+      searchPending: { type: Boolean }
     }
+  }
+
+  static get styles () {
+    return [
+      css` :host { display: inline-block; } :host([hidden]) { display: none; } `,
+      css` * { font-family: 'HCo Ringside Narrow SSm', Arial Narrow, Arial, sans-serif; } `,
+      css` div { position: relative; padding: 1rem; } `,
+      css` .small-padding { padding: 0.25rem; } `,
+      css` label { position: absolute; left: 1rem; top: -0.1rem; font-size: 0.7rem; color: #999; } `,
+      css` input[type="search"] { padding: 0.3rem; border: thin solid #666666; border-radius: 0.2rem; margin-right: 0.2rem; min-width: 15rem; } `,
+      css` button { padding: 0.3rem 1rem; border: thin solid #666666; border-radius: 0.05rem; background-color: #0057B8; color: white; cursor: pointer; } `,
+      css` button:hover, button:active { box-shadow: inset 0 0 0.2rem rgba(255, 255, 255, 0.5); background-color: #5199E1; } `,
+      css` .spin { animation: spin 1500ms linear infinite; } `,
+      css` .container { position: relative; font-size: 1.1rem; } `,
+      css` .hidden { display: none; } `,
+      css` .error-display { background-color: rgba(179, 4, 26, 0.8); color: white; position: absolute; top: 3.7rem; box-shadow: 0rem 0.1rem 0.1rem rgba(0, 0, 0, 0.2); } `,
+      css` .error-handle { position: absolute; top: -10px; } `,
+      css` @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } } .search-btn-label { display: none; } `,
+      css` .compact { display: flex; }`,
+      css` .compact > label { position: static; font-size: 0.9rem; align-self: center; } `,
+      css` .compact > input[type="search"] { border-radius: 0; margin-right: 0; min-width: 10rem; }`,
+      css` .compact > button { border-radius: 0; }`,
+      css` .compact > button .search-btn-label { display: none; } `,
+      css` @media not speech { .sr-only { display: none; } } `,
+      css` @media only screen and (min-width: 470px) { .search-btn-label { display: inline-block; } } `
+    ]
   }
 
   constructor () {
     super()
     this.context = 'directory'
+    this.compact = false
     this.errorMessage = ''
     this.errorType = ''
     this.results = null
@@ -44,99 +71,20 @@ export default class ByuPersonLookup extends LitElement {
     this.searchPending = false
   }
 
-  _render ({search, results, searchPending, context}) {
+  render () {
+    const {
+      context,
+      results,
+      search
+    } = this
     // console.log(`search=${search}, context=${context}`)
     const [, , , , searchIconPath] = faSearch.icon
     const [, , , , spinIconPath] = faSpinner.icon
     const [, , , , banIconPath] = faBan.icon
     const [, , , , warnIconPath] = faExclamationTriangle.icon
-    const css = html`
-      <style>
-        :host {
-          display: inline-block;
-        }
-        :host([hidden]) {
-          display: none;
-        }
-        * {
-         font-family: 'HCo Ringside Narrow SSm', Arial Narrow, Arial, sans-serif;
-        }
-        div {
-          position: relative;
-          padding: 1rem;
-        }
-        .small-padding {
-          padding: 0.25rem;
-        }
-        label {
-          position: absolute;
-          left: 1rem;
-          top: -0.1rem;
-          font-size: 0.7rem;
-          color: #999;
-        }
-        input[type="search"] {
-          font-size: 1.1rem;
-          padding: 0.3rem;
-          border: thin solid #666666;
-          border-radius: 0.2rem;
-          margin-right: 0.2rem;
-          min-width: 15rem;
-        }
-        button {
-          font-size: 1.1rem;
-          padding: 0.3rem 1rem;
-          border: thin solid #666666;
-          border-radius: 0.05rem;
-          background-color: #0057B8;
-          color: white;
-          cursor: pointer;
-        }
-        button:hover, button:active {
-          box-shadow: inset 0 0 0.2rem rgba(255, 255, 255, 0.5);
-          background-color: #5199E1;
-        }
-        .spin {
-          animation: spin 1500ms linear infinite;
-        }
-        .container {
-          position: relative;
-        }
-        .hidden {
-          display: none;
-        }
-        .error-display {
-          background-color: rgba(179, 4, 26, 0.8);
-          color: white;
-          position: absolute;
-          top: 3.7rem;
-          box-shadow: 0rem 0.1rem 0.1rem rgba(0, 0, 0, 0.2);
-        }
-        .error-handle {
-          position: absolute;
-          top: -10px;
-        }
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-        .search-btn-label {
-          display: none;
-        }
-        @media not speech {
-          .sr-only { display: none; }
-        }
-        @media only screen and (min-width: 470px) {
-          .search-btn-label {
-            display: inline-block;
-          }
-        }
-      </style>
-    `
 
     return html`
-    ${css}
-    <div class="container">
+    <div class=${this.compact ? 'compact container' : 'container'}>
       <label for="search">
         <slot>
           No Data Provider
@@ -146,17 +94,15 @@ export default class ByuPersonLookup extends LitElement {
         id="search"
         type="search"
         size="12"
-        value$="${search}"
-        on-input="${e => this.searchChange(e)}"
-        on-search="${e => this.doSearch(e)}"
+        .value=${search}
+        @input=${this.searchChange}
+        @search=${this.doSearch}
       >
-      <button on-click="${e => this.doSearch(e)}">
-        <svg
-          class$="${this.searchPending ? 'spin' : ''}"
-          alt="Search" width="14" height="14" viewBox="0 0 512 512">
+      <button @click=${this.doSearch}>
+        <svg class=${this.searchPending ? 'spin' : ''} alt="Search" width="14" height="14" viewBox="0 0 512 512">
           ${svg`
             <path
-              d$="${this.searchPending ? spinIconPath : searchIconPath}"
+              d=${this.searchPending ? spinIconPath : searchIconPath}
               fill="white"
             />
           `}
@@ -166,35 +112,32 @@ export default class ByuPersonLookup extends LitElement {
         </span>
       </button>
       <slot name="error">
-        <div class$="${this.errorType === '' ? 'hidden' : 'error-display'}">
+        <div class=${this.errorType === '' ? 'hidden' : 'error-display'}>
           <svg class="error-handle" width="10" height="10" viewBox="0 0 100 100">
             <path d="M50,0 L100,100 L0,100 Z" fill="rgba(179, 4, 26, 0.8)">
           </svg>
-          <svg alt="${this.errorType}" width="14" height="14" viewBox="0 0 578 512">
+          <svg alt=${this.errorType} width="14" height="14" viewBox="0 0 578 512">
           ${svg`
             <path
-              d$="${this.errorType === "No Results" ? banIconPath : warnIconPath}"
+              d=${this.errorType === 'No Results' ? banIconPath : warnIconPath}
               fill="white"
             />
           `}
           </svg>
-          ${
-            this.errorType === "No Results" ?
-              this.errorMessage
-              :
-              html`Oops! Something went wrong. <div class="small-padding"><small>${this.errorMessage}</small></div>`
-          }
+          ${this.errorType === 'No Results' ? this.errorMessage : html`
+          Oops! Something went wrong. <div class="small-padding"><small>${this.errorMessage}</small></div>
+          `}
         </div>
       </slot>
     </div>
     <slot name="results">
       <byu-person-lookup-results
-        results="${results}"
-        context="${context}"
-        searchPending="${this.searchPending}"
-        on-byu-lookup-results-close="${e => this.closeResults()}"
-        on-byu-lookup-next-page="${e => this.loadNextPage()}"
-        on-byu-lookup-prev-page="${e => this.loadPrevPage()}"
+        .results=${results}
+        .context=${context}
+        .searchPending=${this.searchPending}
+        @byu-lookup-results-close=${this.closeResults}
+        @byu-lookup-next-page=${this.loadNextPage}
+        @byu-lookup-prev-page=${this.loadPrevPage}
       ></byu-person-lookup-results>
     </slot>
     `
