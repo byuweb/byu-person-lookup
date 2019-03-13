@@ -342,7 +342,7 @@ export default class ByuPersonLookupResults extends LitElement {
             <th>Name</th>
             <th>BYU ID</th>
             <th>Net ID</th>
-            <th>EMP Type</th>
+            <th>EMP Status</th>
             <th>STD Status</th>
           </tr>
         </thead>
