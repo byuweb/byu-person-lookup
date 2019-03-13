@@ -34,7 +34,7 @@ Include the component somewhere in your page, providing the data source componen
 
 ## Configure the component
 Option | Values | Default | Description
-- | - | - | -
+------ | ------ | ------- | -----------
 `context` | `directory`, `admin` | `directory` | controls how the list of matching people is displayed. Valid values are `directory` (the default) which will display contact information, and `admin` which displays identifiers and student and employee statuses.
 `compact` | | | If this attribute is present, the lookup component will render more compactly, removing white space and some text.
 `no-autoselect` | | | If this attribute is present, the results will be shown even if there is an exact match.
