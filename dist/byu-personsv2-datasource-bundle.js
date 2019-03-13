@@ -1001,7 +1001,7 @@ const pickFirst = (acc, curr) => acc || curr;
 function parseLinks (links) {
   const next = lodash_get(links, 'persons__next.href');
   const prev = lodash_get(links, 'persons__prev.href');
-  return {next, prev}
+  return { next, prev }
 }
 
 function parseAddresses (addresses) {
@@ -1095,9 +1095,8 @@ function parsePerson (data) {
 
 function parsePersonV2 (data) {
   const people = data.values.map(parsePerson);
-  console.log(people);
-  const {next, prev} = parseLinks(data.links);
-  return {next, prev, people}
+  const { next, prev } = parseLinks(data.links);
+  return { next, prev, people }
 }
 
 /*
@@ -1121,7 +1120,7 @@ let observer = null;
 
 function connect () {
   if (!observer) {
-    observer = new AuthenticationObserver(({state: state$$1, token: token$$1, user: user$$1, error}) => {
+    observer = new AuthenticationObserver(({ state: state$$1, token: token$$1, user: user$$1, error }) => {
       // React to change
       authHeader = token$$1 ? token$$1.authorizationHeader : null;
     });
@@ -1162,7 +1161,7 @@ async function search (searchText, pageLink) {
     throw new Error('Not authenticated!')
   }
 
-  const {q} = resolveSearchType(searchText);
+  const { q } = resolveSearchType(searchText);
 
   const apiBase = 'https://api.byu.edu:443/byuapi/persons/v2/';
 

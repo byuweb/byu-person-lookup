@@ -1001,7 +1001,7 @@ const pickFirst = (acc, curr) => acc || curr;
 function parseLinks (links) {
   const next = lodash_get(links, 'persons__next.href');
   const prev = lodash_get(links, 'persons__prev.href');
-  return {next, prev}
+  return { next, prev }
 }
 
 function parseAddresses (addresses) {
@@ -1009,22 +1009,22 @@ function parseAddresses (addresses) {
     return null
   }
   return addresses.values
-      .filter(address => address.metadata.validation_response.code === 200)
-      .reduce((all, c) => {
-    const data = [
-      lodash_get(c, 'address_line_1.value', ''),
-      lodash_get(c, 'address_line_2.value', ''),
-      lodash_get(c, 'address_line_3.value', ''),
-      lodash_get(c, 'address_line_4.value', '')
-    ].filter(l => l.trim().length > 0);
-    const key = {
-      'MAL': 'mailing',
-      'RES': 'residential',
-      'WRK': 'work',
-      'PRM': 'permanent'
-    }[c.address_type.value] || c.address_type.value;
-    return Object.assign({}, all, { [key]: data })
-  }, {})
+    .filter(address => address.metadata.validation_response.code === 200)
+    .reduce((all, c) => {
+      const data = [
+        lodash_get(c, 'address_line_1.value', ''),
+        lodash_get(c, 'address_line_2.value', ''),
+        lodash_get(c, 'address_line_3.value', ''),
+        lodash_get(c, 'address_line_4.value', '')
+      ].filter(l => l.trim().length > 0);
+      const key = {
+        'MAL': 'mailing',
+        'RES': 'residential',
+        'WRK': 'work',
+        'PRM': 'permanent'
+      }[c.address_type.value] || c.address_type.value;
+      return Object.assign({}, all, { [key]: data })
+    }, {})
 }
 
 function parseBasic (basic) {
@@ -1063,7 +1063,7 @@ function parseEmployeeSummaries (employeeSummaries) {
     return null
   }
   return {
-    employeeType: lodash_get(employeeSummaries, 'employee_type.value'),
+    employeeType: lodash_get(employeeSummaries, 'employee_role.value'),
     department: lodash_get(employeeSummaries, 'department.value'),
     jobTitle: lodash_get(employeeSummaries, 'job_title.description')
   }
@@ -1091,8 +1091,8 @@ function parsePerson (data) {
 
 function parsePersonV3 (data) {
   const people = data.values.map(parsePerson);
-  const {next, prev} = parseLinks(data.links);
-  return {next, prev, people}
+  const { next, prev } = parseLinks(data.links);
+  return { next, prev, people }
 }
 
 /*
@@ -1116,7 +1116,7 @@ let observer = null;
 
 function connect () {
   if (!observer) {
-    observer = new AuthenticationObserver(({state: state$$1, token: token$$1, user: user$$1, error}) => {
+    observer = new AuthenticationObserver(({ state: state$$1, token: token$$1, user: user$$1, error }) => {
       // React to change
       authHeader = token$$1 ? token$$1.authorizationHeader : null;
     });
@@ -1157,7 +1157,7 @@ async function search (searchText, pageLink) {
     throw new Error('Not authenticated!')
   }
 
-  const {q} = resolveSearchType(searchText);
+  const { q } = resolveSearchType(searchText);
 
   const apiBase = 'https://api.byu.edu:443/byuapi/persons/v3/';
 

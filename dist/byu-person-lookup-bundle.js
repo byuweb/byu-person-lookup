@@ -2221,6 +2221,7 @@ class ByuPersonLookupResults extends LitElement {
     return {
       results: { type: Array },
       context: { type: String },
+      noAutoselect: { type: Boolean },
       searchPending: { type: Boolean }
     }
   }
@@ -2405,17 +2406,24 @@ class ByuPersonLookupResults extends LitElement {
     super();
     this.results = null;
     this.context = 'directory';
+    this.noAutoselect = false;
     this.searchPending = false;
     this.isObserving = false;
   }
 
   updated (changedProperties) {
-    changedProperties.forEach((oldValue, propName) => {
-      console.log(`lookup-results::property changed!
-        ${propName}: '${oldValue}' => '${this[propName]}'`);
-    });
+    /*
+     * changedProperties.forEach((oldValue, propName) => {
+     *   console.log(`lookup-results::property changed!
+     *     ${propName}: '${oldValue}' => '${this[propName]}'`)
+     * })
+     */
+    if (this.results && this.results.length === 1 && !this.noAutoselect) {
+      // Do Autoselect
+      return this.select(this.results[0])
+    }
     if (this.results && this.results.length > 0 && !this.isObserving) {
-      console.log('lookup-results::set up intersection observer');
+      // console.log('lookup-results::set up intersection observer')
       const top = this.shadowRoot.getElementById('top');
       const bottom = this.shadowRoot.getElementById('bottom');
       if (!IntersectionObserver || !top || !bottom) {
@@ -2436,7 +2444,7 @@ class ByuPersonLookupResults extends LitElement {
         });
       }, {});
       // observer.observe(top)
-      console.log('lookup-results::observing!', bottom);
+      // console.log('lookup-results::observing!', bottom)
       observer.observe(bottom);
       this.isObserving = true;
     }
@@ -2615,11 +2623,6 @@ class ByuPersonLookupResults extends LitElement {
 }
 
 /*
-console.log('registering person lookup results')
-window.customElements.define('byu-person-lookup-results', ByuPersonLookupResults)
-*/
-
-/*
  * Copyright 2018 Brigham Young University
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -2640,11 +2643,7 @@ class ByuPersonLookup extends LitElement {
     return {
       context: { type: String, reflect: true },
       compact: { type: Boolean },
-      errorMessage: { type: String },
-      errorType: { type: String },
-      results: { type: Array, attribute: false },
-      search: { type: String },
-      searchPending: { type: Boolean }
+      noAutoselect: { type: Boolean, attribute: 'no-autoselect' }
     }
   }
 
@@ -2699,6 +2698,7 @@ class ByuPersonLookup extends LitElement {
     super();
     this.context = 'directory';
     this.compact = false;
+    this.noAutoselect = false;
     this.errorMessage = '';
     this.errorType = '';
     this.results = null;
@@ -2771,6 +2771,7 @@ class ByuPersonLookup extends LitElement {
         .results=${results}
         .context=${context}
         .searchPending=${this.searchPending}
+        .noAutoselect=${this.noAutoselect}
         @byu-lookup-results-close=${this.closeResults}
         @byu-lookup-next-page=${this.loadNextPage}
         @byu-lookup-prev-page=${this.loadPrevPage}
@@ -2781,6 +2782,7 @@ class ByuPersonLookup extends LitElement {
 
   closeResults () {
     this.results = null;
+    this.requestUpdate();
   }
 
   registerProvider (provider) {
@@ -2811,7 +2813,7 @@ class ByuPersonLookup extends LitElement {
 
   searchResults (e) {
     e.stopPropagation(); // Don't trigger any other lookup components
-    console.log('search results:\n', e.detail);
+    // console.log('search results:\n', e.detail)
     /*
     this.results = Array.isArray(this.results)
     ? this.results.length > 120
@@ -2826,6 +2828,7 @@ class ByuPersonLookup extends LitElement {
       return
     }
     this.results = this.results.concat(e.detail);
+    this.requestUpdate();
   }
 
   searchError (e) {
@@ -2835,11 +2838,13 @@ class ByuPersonLookup extends LitElement {
     this.errorMessage = e.detail;
     this.errorType = 'Service Error';
     console.error('search error:\n', e.detail);
+    this.requestUpdate();
   }
 
   searchBegun (e) {
     e.stopPropagation(); // Don't trigger any other lookup components
     this.searchPending = true;
+    this.requestUpdate();
   }
 
   searchChange (e) {
@@ -2851,6 +2856,7 @@ class ByuPersonLookup extends LitElement {
       const search = this.search;
       this.__lookupProvider.search = search;
     }
+    this.requestUpdate();
   }
 
   doSearch () {
@@ -2861,6 +2867,7 @@ class ByuPersonLookup extends LitElement {
     if (this.search.length > 0) {
       this.fetchFromProvider(this.search);
     }
+    this.requestUpdate();
   }
 
   loadNextPage () {
