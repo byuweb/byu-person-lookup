@@ -2234,9 +2234,6 @@ class ByuPersonLookupResults extends LitElement {
       :host[hidden] {
         display: none;
       }
-      * {
-        font-family: 'HCo Ringside Narrow SSm', Arial Narrow, Arial, sans-serif;
-      }
       .modal {
         z-index: 98;
         background-color: rgba(0, 0, 0, 0.6);
@@ -2650,7 +2647,6 @@ class ByuPersonLookup extends LitElement {
   static get styles () {
     return [
       css` :host { display: inline-block; } :host([hidden]) { display: none; } `,
-      css` * { font-family: 'HCo Ringside Narrow SSm', Arial Narrow, Arial, sans-serif; } `,
       css` div { position: relative; padding: 1rem; } `,
       css` .small-padding { padding: 0.25rem; } `,
       css` label { position: absolute; left: 1rem; top: -0.1rem; font-size: 0.7rem; color: #999; } `,

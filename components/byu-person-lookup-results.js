@@ -40,9 +40,6 @@ export default class ByuPersonLookupResults extends LitElement {
       :host[hidden] {
         display: none;
       }
-      * {
-        font-family: 'HCo Ringside Narrow SSm', Arial Narrow, Arial, sans-serif;
-      }
       .modal {
         z-index: 98;
         background-color: rgba(0, 0, 0, 0.6);
