@@ -27,6 +27,7 @@ export default class ByuPersonLookupResults extends LitElement {
     return {
       results: { type: Array },
       context: { type: String },
+      noAutoselect: { type: Boolean },
       searchPending: { type: Boolean }
     }
   }
@@ -211,17 +212,24 @@ export default class ByuPersonLookupResults extends LitElement {
     super()
     this.results = null
     this.context = 'directory'
+    this.noAutoselect = false
     this.searchPending = false
     this.isObserving = false
   }
 
   updated (changedProperties) {
-    changedProperties.forEach((oldValue, propName) => {
-      console.log(`lookup-results::property changed!
-        ${propName}: '${oldValue}' => '${this[propName]}'`)
-    })
+    /*
+     * changedProperties.forEach((oldValue, propName) => {
+     *   console.log(`lookup-results::property changed!
+     *     ${propName}: '${oldValue}' => '${this[propName]}'`)
+     * })
+     */
+    if (this.results && this.results.length === 1 && !this.noAutoselect) {
+      // Do Autoselect
+      return this.select(this.results[0])
+    }
     if (this.results && this.results.length > 0 && !this.isObserving) {
-      console.log('lookup-results::set up intersection observer')
+      // console.log('lookup-results::set up intersection observer')
       const top = this.shadowRoot.getElementById('top')
       const bottom = this.shadowRoot.getElementById('bottom')
       if (!IntersectionObserver || !top || !bottom) {
@@ -242,7 +250,7 @@ export default class ByuPersonLookupResults extends LitElement {
         })
       }, {})
       // observer.observe(top)
-      console.log('lookup-results::observing!', bottom)
+      // console.log('lookup-results::observing!', bottom)
       observer.observe(bottom)
       this.isObserving = true
     }
@@ -420,7 +428,3 @@ export default class ByuPersonLookupResults extends LitElement {
   }
 }
 
-/*
-console.log('registering person lookup results')
-window.customElements.define('byu-person-lookup-results', ByuPersonLookupResults)
-*/
