@@ -45,8 +45,12 @@
                 <option value="directory">Directory</option>
                 <option value="admin">Admin</option>
             </select>
+            <br>
             <label for="searchCompact">Compact View</label>
             <input type="checkbox" id="searchCompact">
+            <br>
+            <label for="searchNoauto">No Autoselect</label>
+            <input type="checkbox" id="searchNoauto">
         </div>
         <div>
             <h1>Test Authentication (from WSO2)</h1>
@@ -134,6 +138,17 @@
             } else {
                 document.getElementById('lookup-2').removeAttribute('compact')
                 document.getElementById('lookup-3').removeAttribute('compact')
+            }
+        })
+
+        document.getElementById('searchNoauto').addEventListener('change', e => {
+            const val = e.target.checked
+            if (val) {
+                document.getElementById('lookup-2').setAttribute('no-autoselect', '')
+                document.getElementById('lookup-3').setAttribute('no-autoselect', '')
+            } else {
+                document.getElementById('lookup-2').removeAttribute('no-autoselect')
+                document.getElementById('lookup-3').removeAttribute('no-autoselect')
             }
         })
     </script>
