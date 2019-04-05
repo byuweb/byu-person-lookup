@@ -1048,7 +1048,8 @@ function parseEmailAddresses (emailAddresses) {
     return null
   }
   return emailAddresses.values.map(e => lodash_get(e, 'email_address.value', ''))
-    .filter(e => !!e)
+    .map(e => e.trim())
+    .filter(e => e.length > 0)
     .reduce(pickFirst, '')
 }
 
@@ -1057,7 +1058,8 @@ function parsePhones (phones) {
     return null
   }
   return phones.values.map(p => lodash_get(p, 'phone_number.value', ''))
-    .filter(p => !!p)
+    .map(p => p.trim())
+    .filter(p => p.length > 0)
     .reduce(pickFirst, '')
 }
 
@@ -1066,7 +1068,7 @@ function parseEmployeeSummaries (employeeSummaries) {
     return null
   }
   return {
-    employeeType: lodash_get(employeeSummaries, 'employee_type.value'),
+    employeeStatus: lodash_get(employeeSummaries, 'employee_type.value'),
     department: lodash_get(employeeSummaries, 'department.value'),
     jobTitle: lodash_get(employeeSummaries, 'job_title.description')
   }
@@ -1080,8 +1082,31 @@ function parseStudentSummaries (studentSummaries) {
   return { studentStatus }
 }
 
+function pickAddress (addrs) {
+  if (addrs.mailing) return addrs.mailing
+  if (addrs.residential) return addrs.mailing
+  if (addrs.permanent) return addrs.permanent
+  return []
+}
+
+function isEmployee (results) {
+  if (results.employeeStatus) {
+    return /ACT|LEV/.test(results.employeeStatus)
+  }
+  return results.department && results.jobTitle
+}
+
+function buildAdditionalInfo (results) {
+  const workAddress = results.addresses.work ? results.addresses.work : [];
+  return [
+    results.department,
+    results.jobTitle,
+    ...workAddress
+  ]
+}
+
 function parsePerson (data) {
-  return Object.assign(
+  const results = Object.assign(
     {
       addresses: parseAddresses(data.addresses),
       email: parseEmailAddresses(data.email_addresses),
@@ -1090,7 +1115,31 @@ function parsePerson (data) {
     parseBasic(data.basic),
     parseEmployeeSummaries(data.employee_summaries),
     parseStudentSummaries(data.student_summaries)
-  )
+  );
+  const address = pickAddress(results.addresses);
+  const {
+    email,
+    phone,
+    name,
+    byuId,
+    netId,
+    employeeStatus,
+    studentStatus
+  } = results;
+  const showAdditionalInfo = isEmployee(results);
+  const additionalInfo = showAdditionalInfo ? buildAdditionalInfo(results) : [];
+  return {
+    address,
+    email,
+    phone,
+    name,
+    byuId,
+    netId,
+    employeeStatus,
+    studentStatus,
+    showAdditionalInfo,
+    additionalInfo
+  }
 }
 
 function parsePersonV2 (data) {

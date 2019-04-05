@@ -1063,7 +1063,7 @@ function parseEmployeeSummaries (employeeSummaries) {
     return null
   }
   return {
-    employeeType: lodash_get(employeeSummaries, 'employee_role.value'),
+    employeeStatus: lodash_get(employeeSummaries, 'employee_role.value'),
     department: lodash_get(employeeSummaries, 'department.value'),
     jobTitle: lodash_get(employeeSummaries, 'job_title.description')
   }
@@ -1077,16 +1077,64 @@ function parseStudentSummaries (studentSummaries) {
   return { studentStatus }
 }
 
+function pickAddress (addrs) {
+  if (addrs.mailing) return addrs.mailing
+  if (addrs.residential) return addrs.mailing
+  if (addrs.permanent) return addrs.permanent
+  return []
+}
+
+function isEmployee (results) {
+  if (results.employeeStatus) {
+    return /ACT|LEV/.test(results.employeeStatus)
+  }
+  return results.department && results.jobTitle
+}
+
+function buildAdditionalInfo (results) {
+  const workAddress = results.addresses.work ? results.addresses.work : [];
+  return [
+    results.department,
+    results.jobTitle,
+    ...workAddress
+  ]
+}
+
 function parsePerson (data) {
-  return Object.assign({
-    addresses: parseAddresses(data.addresses),
-    email: parseEmailAddresses(data.email_addresses),
-    phone: parsePhones(data.phones)
-  },
-  parseBasic(data.basic),
-  parseEmployeeSummaries(data.employee_summary),
-  parseStudentSummaries(data.student_summary)
-  )
+  const results = Object.assign(
+    {
+      addresses: parseAddresses(data.addresses),
+      email: parseEmailAddresses(data.email_addresses),
+      phone: parsePhones(data.phones)
+    },
+    parseBasic(data.basic),
+    parseEmployeeSummaries(data.employee_summary),
+    parseStudentSummaries(data.student_summary)
+  );
+  const address = pickAddress(results.addresses);
+  const {
+    email,
+    phone,
+    name,
+    byuId,
+    netId,
+    employeeStatus,
+    studentStatus
+  } = results;
+  const showAdditionalInfo = isEmployee(results);
+  const additionalInfo = showAdditionalInfo ? buildAdditionalInfo(results) : [];
+  return {
+    address,
+    email,
+    phone,
+    name,
+    byuId,
+    netId,
+    employeeStatus,
+    studentStatus,
+    showAdditionalInfo,
+    additionalInfo
+  }
 }
 
 function parsePersonV3 (data) {
