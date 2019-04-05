@@ -69,21 +69,16 @@ certain events:
 ```javascript
 [
   {
-    addresses: {
-      mailing: [/*address lines*/],
-      work: [/*address lines*/],
-      permanent: [/*address lines*/],
-      residential: [/*address lines*/]
-    },
-    email: '',
-    phone: '',
-    name: '',
-    byuId: '',
-    netId: '',
-    employeeType: '',
-    department: '',
-    jobTitle: '',
-    studentStatus: ''
+    address: [String],
+    email: String,
+    phone: String,
+    name: String,
+    byuId: String,
+    netId: String,
+    employeeStatus: String,
+    studentStatus: String,
+    showAdditionalInfo: Boolean,
+    additionalInfo: [String]
   },
   ...
 ]

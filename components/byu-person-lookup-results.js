@@ -158,7 +158,7 @@ export default class ByuPersonLookupResults extends LitElement {
         margin-top: calc(1rem - 14px);
       }
       .card.placeholder { cursor: default; }
-      svg.placeholder { filter: blur(1px); width: 18rem; height: 6rem; }
+      svg.placeholder { filter: blur(1px); width: 100%; height: 6rem; }
       tr.placeholder svg.placeholder { width: 100%; max-height: 1rem; }
       svg.placeholder rect {
         animation: pulse 1000ms ease-in-out infinite alternate;
@@ -290,22 +290,17 @@ export default class ByuPersonLookupResults extends LitElement {
         <td>${row.name}</td>
         <td>${row.byuId}</td>
         <td>${row.netId}</td>
-        <td>${row.employeeType}</td>
+        <td>${row.employeeStatus}</td>
         <td>${row.studentStatus}</td>
       </tr>
     `
 
-    const renderEmployeeInfo = row => {
-      if (
-        /ACT|LEV/.test(row.employeeType) ||
-        (row.employeeType === '' && row.jobTitle && row.department)
-      ) {
+    const renderAdditionalInfo = row => {
+      if (row.showAdditionalInfo && row.additionalInfo) {
         return html`
-          <div>
-            <div>${row.jobTitle}</div>
-            <div>${row.department}</div>
-            <div>${row.addresses ? row.addresses.work ? renderAddress(row.addresses.work) : '' : ''}</div>
-          </div>
+          <ul>
+            ${row.additionalInfo.map(line => html`<li>${line}</li>`)}
+          </ul>
         `
       }
       return html`<div></div>`
@@ -327,11 +322,11 @@ export default class ByuPersonLookupResults extends LitElement {
     const renderDirectoryCard = row => html`
       <div class="card" @click=${e => this.select(row)}>
         <h3>${row.name}</h3>
-        ${renderEmployeeInfo(row)}
+        ${renderAdditionalInfo(row)}
         <div class="contact">
           <div>${renderIcon(envelopeIconPath)}${row.email}</div>
           <div>${renderIcon(phoneIconPath)}${row.phone}</div>
-          <div>${renderIcon(homeIconPath)}${row.addresses ? row.addresses.mailing ? renderAddress(row.addresses.mailing) : '' : ''}</div>
+          <div>${renderIcon(homeIconPath)}${row.address ? renderAddress(row.address) : ''}</div>
         </div>
       </div>
     `
@@ -348,7 +343,7 @@ export default class ByuPersonLookupResults extends LitElement {
         </thead>
         <tbody>
           ${results.map(r => renderAdminRow(r))}
-          ${this.searchPending ? renderPlaceholderRows() : ''}
+          ${this.searchPending ? renderPlaceholderRows() : renderPlaceholderRows()}
         </tbody>
       </table>
     `
@@ -424,4 +419,3 @@ export default class ByuPersonLookupResults extends LitElement {
     this.dispatch('byu-lookup-prev-page')
   }
 }
-
