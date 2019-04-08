@@ -207,6 +207,7 @@ class ByuPersonLookup extends LitElement {
     if (e.detail.length === 0 && this.results.length === 0) {
       this.errorMessage = 'Hmmm, we couldn\'t find anyone.'
       this.errorType = 'No Results'
+      this.requestUpdate()
       return
     }
     this.results = this.results.concat(e.detail)
