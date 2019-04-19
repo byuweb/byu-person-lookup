@@ -2244,6 +2244,7 @@ class ByuPersonLookupResults extends LitElement {
         bottom: 0;
         padding: 0.5rem;
         background-color: white;
+        color: #141414;
         display: grid;
         grid-template-columns: 1fr;
         grid-template-rows: auto auto 1fr auto;
