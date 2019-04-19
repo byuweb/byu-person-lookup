@@ -67,7 +67,7 @@ class ByuPersonLookup extends LitElement {
       css` .error-handle { position: absolute; top: -10px; } `,
       css` @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } } .search-btn-label { display: none; } `,
       css` .compact { display: flex; padding: 0; }`,
-      css` .compact > label { position: static; font-size: 0.9rem; align-self: center; } `,
+      css` .compact > label { position: static; font-size: 0.9rem; align-self: center; margin: 0rem 0.2rem; } `,
       css` .compact > input[type="search"] { border-radius: 0; margin-right: 0; min-width: 10rem; font-size: 0.9rem; }`,
       css` .compact > button { border-radius: 0; font-size: 0.9rem; }`,
       css` .compact > button .search-btn-label { display: none; } `,
