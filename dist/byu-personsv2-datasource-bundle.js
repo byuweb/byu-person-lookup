@@ -1083,6 +1083,7 @@ function parseStudentSummaries (studentSummaries) {
 }
 
 function pickAddress (addrs) {
+  if (!addrs) return []
   if (addrs.mailing) return addrs.mailing
   if (addrs.residential) return addrs.mailing
   if (addrs.permanent) return addrs.permanent

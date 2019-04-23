@@ -165,6 +165,10 @@ class ByuPersonLookup extends LitElement {
   closeResults () {
     this.results = null
     this.requestUpdate()
+
+    this.setPropsOnSearchResults({
+      results: null
+    })
   }
 
   registerProvider (provider) {
@@ -177,20 +181,38 @@ class ByuPersonLookup extends LitElement {
     this.prevPageFromProvider = this.__lookupProvider.prevPage
   }
 
-  connectedCallback () {
+  async connectedCallback () {
     super.connectedCallback()
-    const provider = this.firstElementChild
-    if (provider && provider.performSearch) {
-      this.registerProvider(provider)
-    } else {
-      const providerErrorFn = () => { throw new Error('No valid lookup provider found!') }
-      const timeout = setTimeout(providerErrorFn, 10000)
-      this.addEventListener('byu-lookup-datasource-register', (e) => {
-        e.stopPropagation()
-        this.registerProvider(e.target)
-        clearTimeout(timeout)
-      })
+
+    await this.requestUpdate()
+
+    const providerSlot = this.shadowRoot.querySelector('slot')
+    if (providerSlot) {
+      const assignedElements = Array.from(providerSlot.assignedElements())
+      const provider = assignedElements.find(e => e.performSearch)
+      if (provider) {
+        this.registerProvider(provider)
+        return
+      }
     }
+    const providerErrorFn = () => { throw new Error('No valid lookup provider found!') }
+    const timeout = setTimeout(providerErrorFn, 10000)
+    this.addEventListener('byu-lookup-datasource-register', (e) => {
+      e.stopPropagation()
+      this.registerProvider(e.target)
+      clearTimeout(timeout)
+    })
+  }
+
+  setPropsOnSearchResults (payload) {
+    const resultsSlot = this.shadowRoot.querySelector('slot[name=\'results\'')
+    const resultsElements = resultsSlot.assignedElements()
+    if (resultsElements.length === 0) return
+
+    const el = resultsElements[0]
+    payload.entries.forEach(([key, value]) => {
+      el[key] = value
+    })
   }
 
   searchResults (e) {
@@ -212,6 +234,10 @@ class ByuPersonLookup extends LitElement {
     }
     this.results = this.results.concat(e.detail)
     this.requestUpdate()
+    this.setPropsOnSearchResults({
+      searchPending: false,
+      results: this.results
+    })
   }
 
   searchError (e) {
@@ -222,12 +248,18 @@ class ByuPersonLookup extends LitElement {
     this.errorType = 'Service Error'
     console.error('search error:\n', e.detail)
     this.requestUpdate()
+    this.setPropsOnSearchResults({
+      searchPending: false
+    })
   }
 
   searchBegun (e) {
     e.stopPropagation() // Don't trigger any other lookup components
     this.searchPending = true
     this.requestUpdate()
+    this.setPropsOnSearchResults({
+      searchPending: true
+    })
   }
 
   searchChange (e) {
