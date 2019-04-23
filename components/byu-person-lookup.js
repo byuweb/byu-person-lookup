@@ -186,6 +186,8 @@ class ByuPersonLookup extends LitElement {
 
     await this.requestUpdate()
 
+    this.setupEventsOnSearchResults()
+
     const providerSlot = this.shadowRoot.querySelector('slot')
     if (providerSlot) {
       const assignedElements = Array.from(providerSlot.assignedElements())
@@ -213,6 +215,17 @@ class ByuPersonLookup extends LitElement {
     Object.entries(payload).forEach(([key, value]) => {
       el[key] = value
     })
+  }
+
+  setupEventsOnSearchResults () {
+    const resultsSlot = this.shadowRoot.querySelector('slot[name=\'results\'')
+    const resultsElements = resultsSlot.assignedElements()
+    if (resultsElements.length === 0) return
+
+    const el = resultsElements[0]
+    el.addEventListener('byu-lookup-results-close', this.closeResults)
+    el.addEventListener('byu-lookup-next-page', this.loadNextPage)
+    el.addEventListener('byu-lookup-prev-page', this.loadPrevPage)
   }
 
   searchResults (e) {

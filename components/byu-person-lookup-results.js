@@ -344,7 +344,7 @@ export default class ByuPersonLookupResults extends LitElement {
         </thead>
         <tbody>
           ${results.map(r => renderAdminRow(r))}
-          ${this.searchPending ? renderPlaceholderRows() : renderPlaceholderRows()}
+          ${this.searchPending ? renderPlaceholderRows() : ''}
         </tbody>
       </table>
     `
