@@ -2820,7 +2820,7 @@ class ByuPersonLookup extends LitElement {
     if (resultsElements.length === 0) return
 
     const el = resultsElements[0];
-    payload.entries.forEach(([key, value]) => {
+    Object.entries(payload).forEach(([key, value]) => {
       el[key] = value;
     });
   }
