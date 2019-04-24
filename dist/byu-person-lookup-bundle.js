@@ -2668,11 +2668,12 @@ class ByuPersonLookup extends LitElement {
       css` .container { position: relative; font-size: 1.1rem; } `,
       css` .hidden { display: none; } `,
       css` .error-display {
-        background-color: rgba(179, 4, 26, 0.8);
+        background-color: rgba(179, 4, 26, 0.95);
         color: white;
         position: absolute;
         top: 3.7rem;
         box-shadow: 0rem 0.1rem 0.1rem rgba(0, 0, 0, 0.2);
+        z-index: 19;
       } `,
       css` .error-handle { position: absolute; top: -10px; } `,
       css` @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } } .search-btn-label { display: none; } `,
@@ -2681,6 +2682,7 @@ class ByuPersonLookup extends LitElement {
       css` .compact > input[type="search"] { border-radius: 0; margin-right: 0; min-width: 10rem; font-size: 0.9rem; }`,
       css` .compact > button { border-radius: 0; font-size: 0.9rem; }`,
       css` .compact > button .search-btn-label { display: none; } `,
+      css` .compact .error-display { top: 2.5rem; } `,
       css` @media not speech { .sr-only { display: none; } } `,
       css` @media only screen and (min-width: 470px) { .search-btn-label { display: inline-block; } } `
     ]
