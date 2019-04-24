@@ -116,6 +116,7 @@ class ByuPersonLookup extends LitElement {
         .value=${search}
         @input=${this.searchChange}
         @search=${this.doSearch}
+        @keyup=${this.submitOnEnter}
       >
       <button @click=${this.doSearch}>
         <svg class=${this.searchPending ? 'spin' : ''} alt="Search" width="14" height="14" viewBox="0 0 512 512">
@@ -192,8 +193,8 @@ class ByuPersonLookup extends LitElement {
 
     const providerSlot = this.shadowRoot.querySelector('slot')
     if (providerSlot) {
-      const assignedElements = Array.from(providerSlot.assignedElements())
-      const provider = assignedElements.find(e => e.performSearch)
+      const assignedNodes = Array.from(providerSlot.assignedNodes())
+      const provider = assignedNodes.find(e => e.performSearch)
       if (provider) {
         this.registerProvider(provider)
         return
@@ -210,10 +211,10 @@ class ByuPersonLookup extends LitElement {
 
   setPropsOnSearchResults (payload) {
     const resultsSlot = this.shadowRoot.querySelector('slot[name=\'results\'')
-    const resultsElements = resultsSlot.assignedElements()
-    if (resultsElements.length === 0) return
+    const resultsNodes = resultsSlot.assignedNodes()
+    if (resultsNodes.length === 0) return
 
-    const el = resultsElements[0]
+    const el = resultsNodes[0]
     Object.entries(payload).forEach(([key, value]) => {
       el[key] = value
     })
@@ -221,10 +222,10 @@ class ByuPersonLookup extends LitElement {
 
   setupEventsOnSearchResults () {
     const resultsSlot = this.shadowRoot.querySelector('slot[name=\'results\'')
-    const resultsElements = resultsSlot.assignedElements()
-    if (resultsElements.length === 0) return
+    const resultsNodes = resultsSlot.assignedNodes()
+    if (resultsNodes.length === 0) return
 
-    const el = resultsElements[0]
+    const el = resultsNodes[0]
     el.addEventListener('byu-lookup-results-close', this.closeResults)
     el.addEventListener('byu-lookup-next-page', this.loadNextPage)
     el.addEventListener('byu-lookup-prev-page', this.loadPrevPage)
@@ -287,6 +288,12 @@ class ByuPersonLookup extends LitElement {
       this.__lookupProvider.search = search
     }
     this.requestUpdate()
+  }
+
+  submitOnEnter (e) {
+    if (e.key === 'Enter') {
+      this.doSearch()
+    }
   }
 
   doSearch () {

@@ -3386,6 +3386,7 @@ const executePersonsv3Request = async (search$$1, target, pageLink) => {
       bubbles: true,
       detail: err
     }));
+    return { next: null, prev: null }
   }
 };
 

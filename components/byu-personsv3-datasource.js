@@ -33,6 +33,7 @@ const executePersonsv3Request = async (search, target, pageLink) => {
       bubbles: true,
       detail: err
     }))
+    return { next: null, prev: null }
   }
 }
 
