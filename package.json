@@ -1,6 +1,6 @@
 {
   "name": "byu-person-lookup",
-  "version": "1.6.10",
+  "version": "1.6.11",
   "description": "A Web Component to look up a person, display a list of possible matches, and fire an event when a person is selected from a list.",
   "main": "index.js",
   "scripts": {
