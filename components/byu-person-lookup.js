@@ -179,6 +179,11 @@ class ByuPersonLookup extends LitElement {
     this.addEventListener('byu-lookup-datasource-result', this.searchResults)
     this.addEventListener('byu-lookup-datasource-error', this.searchError)
     this.addEventListener('byu-lookup-datasource-searching', this.searchBegun)
+
+    this.addEventListener('byu-lookup-results-close', this.closeResults)
+    this.addEventListener('byu-lookup-next-page', this.loadNextPage)
+    this.addEventListener('byu-lookup-prev-page', this.loadPrevPage)
+
     this.fetchFromProvider = this.__lookupProvider.performSearch
     this.nextPageFromProvider = this.__lookupProvider.nextPage
     this.prevPageFromProvider = this.__lookupProvider.prevPage
@@ -188,8 +193,6 @@ class ByuPersonLookup extends LitElement {
     super.connectedCallback()
 
     await this.requestUpdate()
-
-    this.setupEventsOnSearchResults()
 
     const providerSlot = this.shadowRoot.querySelector('slot')
     if (providerSlot) {
@@ -218,17 +221,6 @@ class ByuPersonLookup extends LitElement {
     Object.entries(payload).forEach(([key, value]) => {
       el[key] = value
     })
-  }
-
-  setupEventsOnSearchResults () {
-    const resultsSlot = this.shadowRoot.querySelector('slot[name=\'results\'')
-    const resultsNodes = resultsSlot.assignedNodes()
-    if (resultsNodes.length === 0) return
-
-    const el = resultsNodes[0]
-    el.addEventListener('byu-lookup-results-close', this.closeResults)
-    el.addEventListener('byu-lookup-next-page', this.loadNextPage)
-    el.addEventListener('byu-lookup-prev-page', this.loadPrevPage)
   }
 
   searchResults (e) {
@@ -302,19 +294,19 @@ class ByuPersonLookup extends LitElement {
     this.errorType = ''
     this.results = []
     if (this.search.length > 0) {
-      this.fetchFromProvider(this.search)
+      this.fetchFromProvider.bind(this.__lookupProvider)(this.search)
     }
     this.requestUpdate()
   }
 
   loadNextPage () {
     // console.log(`loadNextPage`)
-    this.nextPageFromProvider()
+    this.nextPageFromProvider.bind(this.__lookupProvider)()
   }
 
   loadPrevPage () {
     // console.log(`loadPrevPage`)
-    this.prevPageFromProvider()
+    this.prevPageFromProvider.bind(this.__lookupProvider)()
   }
 }
 
