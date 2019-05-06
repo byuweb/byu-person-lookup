@@ -2904,19 +2904,19 @@ class ByuPersonLookup extends LitElement {
     this.errorType = '';
     this.results = [];
     if (this.search.length > 0) {
-      this.fetchFromProvider.bind(this.__lookupProvider)(this.search);
+      this.fetchFromProvider.call(this.__lookupProvider, this.search);
     }
     this.requestUpdate();
   }
 
   loadNextPage () {
     // console.log(`loadNextPage`)
-    this.nextPageFromProvider.bind(this.__lookupProvider)();
+    this.nextPageFromProvider.call(this.__lookupProvider);
   }
 
   loadPrevPage () {
     // console.log(`loadPrevPage`)
-    this.prevPageFromProvider.bind(this.__lookupProvider)();
+    this.prevPageFromProvider.call(this.__lookupProvider);
   }
 }
 
