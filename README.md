@@ -51,6 +51,18 @@ When the user selects one of the people from the list, the component raises an e
   },
 ```
 
+## Help Text
+You can provide search hints or other help text by including HTML content in the `help-text` slot:
+```html
+<byu-person-lookup>
+    <hypothetical-twitter-data-source></hypothetical-twitter-data-source>
+    <div slot="help-text">
+        <p>You can search by twitter handle!</p>
+        <p>Try @BYUfootball!</p>
+    </div>
+</byu-person-lookup>
+```
+
 # Data source implementation
 The lookup component and its data source are loosely coupled so that alternative data sources can be
 easily used. For example, an admissions interface may wish to only search for people who have
