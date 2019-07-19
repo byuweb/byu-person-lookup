@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as personsv3Source from '../lib/personsv3LookupDataSource'
+import * as personsv3Source from '../lib/personsv3SearchDataSource'
 import { LitElement, html } from '@polymer/lit-element'
 
 const { CustomEvent } = window

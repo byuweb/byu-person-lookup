@@ -19,6 +19,7 @@ import faSearch from '@fortawesome/fontawesome-free-solid/faSearch'
 import faSpinner from '@fortawesome/fontawesome-free-solid/faSpinner'
 import faBan from '@fortawesome/fontawesome-free-solid/faBan'
 import faExclamationTriangle from '@fortawesome/fontawesome-free-solid/faExclamationTriangle'
+import faQuestionCircle from '@fortawesome/fontawesome-free-solid/faQuestionCircle'
 import ByuPersonLookupResults from './byu-person-lookup-results'
 
 class ByuPersonLookup extends LitElement {
@@ -74,7 +75,43 @@ class ByuPersonLookup extends LitElement {
       css` .compact > button .search-btn-label { display: none; } `,
       css` .compact .error-display { top: 2.5rem; } `,
       css` @media not speech { .sr-only { display: none; } } `,
-      css` @media only screen and (min-width: 470px) { .search-btn-label { display: inline-block; } } `
+      css` @media only screen and (min-width: 470px) { .search-btn-label { display: inline-block; } } `,
+      css` .center-vertically {
+        padding: 0 0.3rem;
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        top: 0.3rem;
+      }`,
+      css` .compact > .center-vertically {
+        top: 0;
+      }`,
+      css` .search-info-icon > .search-info {
+        transform-origin: top right;
+        transform: scale(0, 0);
+        opacity: 0;
+        position: absolute;
+        top: calc(0.3rem + 23px);
+        background-color: rgba(20,20,20,0.9);
+        width: 20rem;
+        padding; 0.5rem;
+        z-index: 19;
+        transition: opacity 120ms ease-out, transform 500ms ease 120ms;
+      }`,
+      css` .search-info { right: 0rem; }`,
+      css` .search-info.position-to-right { transform-origin: top; left: -8rem; }`,
+      css` .compact > .center-vertically > .search-info { top: 30px; }`,
+      css` .search-info div { padding: 0; color: white; }`,
+      css` .search-info-handle {
+        position: absolute;
+        top: -10px;
+        right: 11px;
+      }`,
+      css` .position-to-right > .search-info-handle { left: calc(8rem + 11px); }`,
+      css` .search-info-icon:hover > .search-info { transform: scale(1, 1); opacity: 1; }`,
+      css` .hidden { display: none; }`
     ]
   }
 
@@ -88,6 +125,7 @@ class ByuPersonLookup extends LitElement {
     this.results = null
     this.search = ''
     this.searchPending = false
+    this.hasSearchInfoSlotted = false
   }
 
   render () {
@@ -101,6 +139,32 @@ class ByuPersonLookup extends LitElement {
     const [, , , , spinIconPath] = faSpinner.icon
     const [, , , , banIconPath] = faBan.icon
     const [, , , , warnIconPath] = faExclamationTriangle.icon
+    const [, , , , helpIconPath] = faQuestionCircle.icon
+
+    const bounding = this.getBoundingClientRect()
+    console.log('Bounding Rect:\n', bounding)
+    const helpTextOnRight = bounding.left < bounding.width
+    const searchInfo = html`
+    <div class=${this.hasSearchInfoSlotted ? 'search-info-icon center-vertically' : 'hidden search-info-icon center-vertically'}>
+      <svg alt="How to use" width="21" height="21" viewBox="0 0 578 512">
+        <circle cx="260" cy="260" r="260" fill="white" />
+      ${svg`
+        <path
+          d=${helpIconPath}
+          fill="#0057B8"
+        />
+      `}
+      </svg>
+      <div class=${helpTextOnRight ? 'search-info position-to-right' : 'search-info'}>
+        <svg class="search-info-handle" width="10" height="10" viewBox="0 0 100 100">
+          <path d="M50,0 L100,100 L0,100 Z" fill="rgba(20, 20, 20, 0.9)">
+        </svg>
+        <div>
+          <slot @slotchange=${this.helpTextSlotChange} name="help-text"></slot>
+        </div>
+      </div>
+    </div>
+    `
 
     return html`
     <div class=${this.compact ? 'compact container' : 'container'}>
@@ -131,6 +195,7 @@ class ByuPersonLookup extends LitElement {
           ${this.searchPending ? 'Searching' : 'Search'}
         </span>
       </button>
+      ${searchInfo}
       <slot name="error">
         <div class=${this.errorType === '' ? 'hidden' : 'error-display'}>
           <svg class="error-handle" width="10" height="10" viewBox="0 0 100 100">
@@ -210,6 +275,14 @@ class ByuPersonLookup extends LitElement {
       this.registerProvider(e.target)
       clearTimeout(timeout)
     })
+
+    const helpTextSlot = this.shadowRoot.querySelector('slot[name=\'help-text\'')
+    const helpTextNodes = helpTextSlot.assignedNodes()
+    if (helpTextNodes.length > 0) {
+      this.hasSearchInfoSlotted = true
+    }
+
+    this.requestUpdate()
   }
 
   setPropsOnSearchResults (payload) {
@@ -286,6 +359,17 @@ class ByuPersonLookup extends LitElement {
     if (e.key === 'Enter') {
       this.doSearch()
     }
+  }
+
+  helpTextSlotChange (e) {
+    const helpTextSlot = this.shadowRoot.querySelector('slot[name=\'help-text\'')
+    const helpTextNodes = helpTextSlot.assignedNodes()
+    if (helpTextNodes.length > 0) {
+      this.hasSearchInfoSlotted = true
+    } else {
+      this.hasSearchInfoSlotted = false
+    }
+    this.requestUpdate()
   }
 
   doSearch () {

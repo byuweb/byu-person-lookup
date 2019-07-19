@@ -1172,33 +1172,8 @@ function connect () {
   }
 }
 
-function nameParams (search) {
-  let surname = '';
-  let restOfName = '';
-  if (/,/.test(search)) {
-    // Assume 'Last, First'
-    [surname, restOfName] = search.split(',').map(s => s.trim());
-  } else {
-    // Assume 'First Middle Last'
-    const words = search.split(' ');
-    surname = words.slice(-1);
-    restOfName = words.slice(0, -1).join(' ');
-  }
-  return `?surname=${surname}&rest_of_name=${restOfName}`
-}
-
-function resolveSearchType (search) {
-  return search.length < 1
-    ? { q: `?surname=${search}`, label: 'Search' }
-    : /^\d{3,9}$/.test(search)
-      ? { q: `?byu_ids=${search}`, label: 'BYU ID' }
-      : /^[a-z][a-z0-9]{2,7}$/.test(search)
-        ? { q: `?net_ids=${search}`, label: 'Net ID' }
-        : /^[^@]+@.+$/.test(search)
-          ? { q: `?email_addresses.email_address=${search}`, label: 'Email' }
-          : /^[^ ]+ +[^ ]+[^0-9]*$/.test(search)
-            ? { q: `${nameParams(search)}`, label: 'Name' }
-            : { q: `?surname=${search}`, label: 'Name' }
+function resolveSearchType () {
+  return { label: 'Search' }
 }
 
 async function search (searchText, pageLink) {
@@ -1206,9 +1181,12 @@ async function search (searchText, pageLink) {
     throw new Error('Not authenticated!')
   }
 
-  const { q } = resolveSearchType(searchText);
+  const encodedSearchText = encodeURIComponent(searchText);
+  const q = new URLSearchParams();
+  q.append('search_context', 'person_lookup');
+  q.append('search_text', encodedSearchText);
 
-  const apiBase = 'https://api.byu.edu:443/byuapi/persons/v3/';
+  const apiBase = 'https://api.byu.edu:443/byuapi/persons/v3';
 
   const init = {
     method: 'GET',
@@ -1216,8 +1194,11 @@ async function search (searchText, pageLink) {
   };
 
   const fieldSets = 'basic,addresses,email_addresses,phones,employee_summary,student_summary';
+  q.append('field_sets', fieldSets);
 
-  const url = pageLink || `${apiBase}${q}&field_sets=${fieldSets}&page_size=50`;
+  q.append('page_size', '50');
+
+  const url = pageLink || `${apiBase}/?${q.toString()}`;
 
   const response = await window.fetch(url, init);
 

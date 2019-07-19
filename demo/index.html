@@ -15,15 +15,16 @@
     <script type="module" src="https://cdn.byu.edu/byu-person-lookup/latest/byu-person-lookup-bundle.min.js"></script>
     <script type="module" src="https://cdn.byu.edu/byu-person-lookup/latest/byu-personsv2-datasource-bundle.min.js"></script>
     <script type="module" src="https://cdn.byu.edu/byu-person-lookup/latest/byu-personsv3-datasource-bundle.min.js"></script>
-    <!--
-    <script type="module" src="../dist/byu-person-lookup-bundle.js"></script>
-    <script type="module" src="../dist/byu-personsv2-datasource-bundle.js"></script>
-    <script type="module" src="../dist/byu-personsv3-datasource-bundle.js"></script>
-    -->
+    <!-- <script type="module" src="../dist/byu&#45;person&#45;lookup&#45;bundle.js"></script> -->
+    <!-- <script type="module" src="../dist/byu&#45;personsv2&#45;datasource&#45;bundle.js"></script> -->
+    <!-- <script type="module" src="../dist/byu&#45;personsv3&#45;datasource&#45;bundle.js"></script> -->
 </head>
 <body>
     <byu-header>
         <h1 slot="site-title">Demo: BYU Person Lookup Component</h1>
+        <byu-person-lookup slot="search" context="directory" compact no-autoselect>
+            <byu-personsv3-datasource></byu-personsv3-datasource>
+        </byu-person-lookup>
     </byu-header>
 
     <div id="content">
@@ -40,17 +41,20 @@
 
         <p id="selection"></p>
         <div>
-            <label for="searchContext">Search Type</label>
+            <label for="searchContext">Search Type - </label>
             <select id="searchContext">
                 <option value="directory">Directory</option>
                 <option value="admin">Admin</option>
             </select>
             <br>
-            <label for="searchCompact">Compact View</label>
             <input type="checkbox" id="searchCompact">
+            <label for="searchCompact">Compact View</label>
             <br>
-            <label for="searchNoauto">No Autoselect</label>
             <input type="checkbox" id="searchNoauto">
+            <label for="searchNoauto">No Autoselect</label>
+            <br>
+            <input type="checkbox" id="includeHelpText">
+            <label for="includeHelpText">Include Help Text</label>
         </div>
         <div>
             <h1>Test Authentication (from WSO2)</h1>
@@ -64,6 +68,19 @@
             <label for="bearer">Bearer Token</label>
             <input id="bearer" type="text" size="40">
         </div>
+
+        <template id="helpTextTemplate">
+            <div class="helpTextContainer" slot="help-text">
+                <p>This is some help text. Here you can specify how to use the search component.</p>
+                <p>For example, the supported search patterns are:</p>
+                <ul>
+                    <li>A name - Start with a capital letter</li>
+                    <li>BYU ID - Nine numbers</li>
+                    <li>Net ID - 4-8 letters and numbers (starts with a letter)</li>
+                    <li>Email - Be sure to include the @</li>
+                </ul>
+            </div>
+        </template>
 
     </div>
 
@@ -149,6 +166,18 @@
             } else {
                 document.getElementById('lookup-2').removeAttribute('no-autoselect')
                 document.getElementById('lookup-3').removeAttribute('no-autoselect')
+            }
+        })
+
+        document.getElementById('includeHelpText').addEventListener('change', e => {
+            const val = e.target.checked
+            if (val) {
+                const temp = document.getElementById('helpTextTemplate').content
+                    const nodes = Array.from(document.querySelectorAll('byu-person-lookup'))
+                    nodes.forEach(n => n.appendChild(temp.cloneNode(true)))
+            } else {
+                const nodes = Array.from(document.getElementsByClassName('helpTextContainer'))
+                nodes.forEach(n => n.parentElement.removeChild(n))
             }
         })
     </script>

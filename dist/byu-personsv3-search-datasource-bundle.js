@@ -1,3 +1,1245 @@
+const EVENT_PREFIX = 'byu-browser-oauth';
+
+const EVENT_STATE_CHANGE = `${EVENT_PREFIX}-state-changed`;
+const EVENT_CURRENT_INFO_REQUESTED = `${EVENT_PREFIX}-current-info-requested`;
+
+/*
+ * Copyright 2018 Brigham Young University
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+class AuthenticationObserver {
+    constructor(callback, { notifyCurrent = true } = {} ) {
+        this._listener = function (e) {
+            callback(e.detail);
+        };
+        document.addEventListener(EVENT_STATE_CHANGE, this._listener, false);
+        if (notifyCurrent) {
+            dispatch(EVENT_CURRENT_INFO_REQUESTED, { callback });
+        }
+    }
+
+    disconnect() {
+        document.removeEventListener(EVENT_STATE_CHANGE, this._listener, false);
+    }
+}
+
+function dispatch(name, detail) {
+    let event;
+    if (typeof window.CustomEvent === 'function') {
+        event = new CustomEvent(name, { detail });
+    } else {
+        event = document.createEvent('CustomEvent');
+        event.initCustomEvent(name, true, false, detail);
+    }
+    document.dispatchEvent(event);
+}
+
+var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
+
+/**
+ * lodash (Custom Build) <https://lodash.com/>
+ * Build: `lodash modularize exports="npm" -o ./`
+ * Copyright jQuery Foundation and other contributors <https://jquery.org/>
+ * Released under MIT license <https://lodash.com/license>
+ * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
+ * Copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+ */
+
+/** Used as the `TypeError` message for "Functions" methods. */
+var FUNC_ERROR_TEXT = 'Expected a function';
+
+/** Used to stand-in for `undefined` hash values. */
+var HASH_UNDEFINED = '__lodash_hash_undefined__';
+
+/** Used as references for various `Number` constants. */
+var INFINITY = 1 / 0;
+
+/** `Object#toString` result references. */
+var funcTag = '[object Function]',
+    genTag = '[object GeneratorFunction]',
+    symbolTag = '[object Symbol]';
+
+/** Used to match property names within property paths. */
+var reIsDeepProp = /\.|\[(?:[^[\]]*|(["'])(?:(?!\1)[^\\]|\\.)*?\1)\]/,
+    reIsPlainProp = /^\w*$/,
+    reLeadingDot = /^\./,
+    rePropName = /[^.[\]]+|\[(?:(-?\d+(?:\.\d+)?)|(["'])((?:(?!\2)[^\\]|\\.)*?)\2)\]|(?=(?:\.|\[\])(?:\.|\[\]|$))/g;
+
+/**
+ * Used to match `RegExp`
+ * [syntax characters](http://ecma-international.org/ecma-262/7.0/#sec-patterns).
+ */
+var reRegExpChar = /[\\^$.*+?()[\]{}|]/g;
+
+/** Used to match backslashes in property paths. */
+var reEscapeChar = /\\(\\)?/g;
+
+/** Used to detect host constructors (Safari). */
+var reIsHostCtor = /^\[object .+?Constructor\]$/;
+
+/** Detect free variable `global` from Node.js. */
+var freeGlobal = typeof commonjsGlobal == 'object' && commonjsGlobal && commonjsGlobal.Object === Object && commonjsGlobal;
+
+/** Detect free variable `self`. */
+var freeSelf = typeof self == 'object' && self && self.Object === Object && self;
+
+/** Used as a reference to the global object. */
+var root = freeGlobal || freeSelf || Function('return this')();
+
+/**
+ * Gets the value at `key` of `object`.
+ *
+ * @private
+ * @param {Object} [object] The object to query.
+ * @param {string} key The key of the property to get.
+ * @returns {*} Returns the property value.
+ */
+function getValue(object, key) {
+  return object == null ? undefined : object[key];
+}
+
+/**
+ * Checks if `value` is a host object in IE < 9.
+ *
+ * @private
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a host object, else `false`.
+ */
+function isHostObject(value) {
+  // Many host objects are `Object` objects that can coerce to strings
+  // despite having improperly defined `toString` methods.
+  var result = false;
+  if (value != null && typeof value.toString != 'function') {
+    try {
+      result = !!(value + '');
+    } catch (e) {}
+  }
+  return result;
+}
+
+/** Used for built-in method references. */
+var arrayProto = Array.prototype,
+    funcProto = Function.prototype,
+    objectProto = Object.prototype;
+
+/** Used to detect overreaching core-js shims. */
+var coreJsData = root['__core-js_shared__'];
+
+/** Used to detect methods masquerading as native. */
+var maskSrcKey = (function() {
+  var uid = /[^.]+$/.exec(coreJsData && coreJsData.keys && coreJsData.keys.IE_PROTO || '');
+  return uid ? ('Symbol(src)_1.' + uid) : '';
+}());
+
+/** Used to resolve the decompiled source of functions. */
+var funcToString = funcProto.toString;
+
+/** Used to check objects for own properties. */
+var hasOwnProperty = objectProto.hasOwnProperty;
+
+/**
+ * Used to resolve the
+ * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
+ * of values.
+ */
+var objectToString = objectProto.toString;
+
+/** Used to detect if a method is native. */
+var reIsNative = RegExp('^' +
+  funcToString.call(hasOwnProperty).replace(reRegExpChar, '\\$&')
+  .replace(/hasOwnProperty|(function).*?(?=\\\()| for .+?(?=\\\])/g, '$1.*?') + '$'
+);
+
+/** Built-in value references. */
+var Symbol$1 = root.Symbol,
+    splice = arrayProto.splice;
+
+/* Built-in method references that are verified to be native. */
+var Map$1 = getNative(root, 'Map'),
+    nativeCreate = getNative(Object, 'create');
+
+/** Used to convert symbols to primitives and strings. */
+var symbolProto = Symbol$1 ? Symbol$1.prototype : undefined,
+    symbolToString = symbolProto ? symbolProto.toString : undefined;
+
+/**
+ * Creates a hash object.
+ *
+ * @private
+ * @constructor
+ * @param {Array} [entries] The key-value pairs to cache.
+ */
+function Hash(entries) {
+  var index = -1,
+      length = entries ? entries.length : 0;
+
+  this.clear();
+  while (++index < length) {
+    var entry = entries[index];
+    this.set(entry[0], entry[1]);
+  }
+}
+
+/**
+ * Removes all key-value entries from the hash.
+ *
+ * @private
+ * @name clear
+ * @memberOf Hash
+ */
+function hashClear() {
+  this.__data__ = nativeCreate ? nativeCreate(null) : {};
+}
+
+/**
+ * Removes `key` and its value from the hash.
+ *
+ * @private
+ * @name delete
+ * @memberOf Hash
+ * @param {Object} hash The hash to modify.
+ * @param {string} key The key of the value to remove.
+ * @returns {boolean} Returns `true` if the entry was removed, else `false`.
+ */
+function hashDelete(key) {
+  return this.has(key) && delete this.__data__[key];
+}
+
+/**
+ * Gets the hash value for `key`.
+ *
+ * @private
+ * @name get
+ * @memberOf Hash
+ * @param {string} key The key of the value to get.
+ * @returns {*} Returns the entry value.
+ */
+function hashGet(key) {
+  var data = this.__data__;
+  if (nativeCreate) {
+    var result = data[key];
+    return result === HASH_UNDEFINED ? undefined : result;
+  }
+  return hasOwnProperty.call(data, key) ? data[key] : undefined;
+}
+
+/**
+ * Checks if a hash value for `key` exists.
+ *
+ * @private
+ * @name has
+ * @memberOf Hash
+ * @param {string} key The key of the entry to check.
+ * @returns {boolean} Returns `true` if an entry for `key` exists, else `false`.
+ */
+function hashHas(key) {
+  var data = this.__data__;
+  return nativeCreate ? data[key] !== undefined : hasOwnProperty.call(data, key);
+}
+
+/**
+ * Sets the hash `key` to `value`.
+ *
+ * @private
+ * @name set
+ * @memberOf Hash
+ * @param {string} key The key of the value to set.
+ * @param {*} value The value to set.
+ * @returns {Object} Returns the hash instance.
+ */
+function hashSet(key, value) {
+  var data = this.__data__;
+  data[key] = (nativeCreate && value === undefined) ? HASH_UNDEFINED : value;
+  return this;
+}
+
+// Add methods to `Hash`.
+Hash.prototype.clear = hashClear;
+Hash.prototype['delete'] = hashDelete;
+Hash.prototype.get = hashGet;
+Hash.prototype.has = hashHas;
+Hash.prototype.set = hashSet;
+
+/**
+ * Creates an list cache object.
+ *
+ * @private
+ * @constructor
+ * @param {Array} [entries] The key-value pairs to cache.
+ */
+function ListCache(entries) {
+  var index = -1,
+      length = entries ? entries.length : 0;
+
+  this.clear();
+  while (++index < length) {
+    var entry = entries[index];
+    this.set(entry[0], entry[1]);
+  }
+}
+
+/**
+ * Removes all key-value entries from the list cache.
+ *
+ * @private
+ * @name clear
+ * @memberOf ListCache
+ */
+function listCacheClear() {
+  this.__data__ = [];
+}
+
+/**
+ * Removes `key` and its value from the list cache.
+ *
+ * @private
+ * @name delete
+ * @memberOf ListCache
+ * @param {string} key The key of the value to remove.
+ * @returns {boolean} Returns `true` if the entry was removed, else `false`.
+ */
+function listCacheDelete(key) {
+  var data = this.__data__,
+      index = assocIndexOf(data, key);
+
+  if (index < 0) {
+    return false;
+  }
+  var lastIndex = data.length - 1;
+  if (index == lastIndex) {
+    data.pop();
+  } else {
+    splice.call(data, index, 1);
+  }
+  return true;
+}
+
+/**
+ * Gets the list cache value for `key`.
+ *
+ * @private
+ * @name get
+ * @memberOf ListCache
+ * @param {string} key The key of the value to get.
+ * @returns {*} Returns the entry value.
+ */
+function listCacheGet(key) {
+  var data = this.__data__,
+      index = assocIndexOf(data, key);
+
+  return index < 0 ? undefined : data[index][1];
+}
+
+/**
+ * Checks if a list cache value for `key` exists.
+ *
+ * @private
+ * @name has
+ * @memberOf ListCache
+ * @param {string} key The key of the entry to check.
+ * @returns {boolean} Returns `true` if an entry for `key` exists, else `false`.
+ */
+function listCacheHas(key) {
+  return assocIndexOf(this.__data__, key) > -1;
+}
+
+/**
+ * Sets the list cache `key` to `value`.
+ *
+ * @private
+ * @name set
+ * @memberOf ListCache
+ * @param {string} key The key of the value to set.
+ * @param {*} value The value to set.
+ * @returns {Object} Returns the list cache instance.
+ */
+function listCacheSet(key, value) {
+  var data = this.__data__,
+      index = assocIndexOf(data, key);
+
+  if (index < 0) {
+    data.push([key, value]);
+  } else {
+    data[index][1] = value;
+  }
+  return this;
+}
+
+// Add methods to `ListCache`.
+ListCache.prototype.clear = listCacheClear;
+ListCache.prototype['delete'] = listCacheDelete;
+ListCache.prototype.get = listCacheGet;
+ListCache.prototype.has = listCacheHas;
+ListCache.prototype.set = listCacheSet;
+
+/**
+ * Creates a map cache object to store key-value pairs.
+ *
+ * @private
+ * @constructor
+ * @param {Array} [entries] The key-value pairs to cache.
+ */
+function MapCache(entries) {
+  var index = -1,
+      length = entries ? entries.length : 0;
+
+  this.clear();
+  while (++index < length) {
+    var entry = entries[index];
+    this.set(entry[0], entry[1]);
+  }
+}
+
+/**
+ * Removes all key-value entries from the map.
+ *
+ * @private
+ * @name clear
+ * @memberOf MapCache
+ */
+function mapCacheClear() {
+  this.__data__ = {
+    'hash': new Hash,
+    'map': new (Map$1 || ListCache),
+    'string': new Hash
+  };
+}
+
+/**
+ * Removes `key` and its value from the map.
+ *
+ * @private
+ * @name delete
+ * @memberOf MapCache
+ * @param {string} key The key of the value to remove.
+ * @returns {boolean} Returns `true` if the entry was removed, else `false`.
+ */
+function mapCacheDelete(key) {
+  return getMapData(this, key)['delete'](key);
+}
+
+/**
+ * Gets the map value for `key`.
+ *
+ * @private
+ * @name get
+ * @memberOf MapCache
+ * @param {string} key The key of the value to get.
+ * @returns {*} Returns the entry value.
+ */
+function mapCacheGet(key) {
+  return getMapData(this, key).get(key);
+}
+
+/**
+ * Checks if a map value for `key` exists.
+ *
+ * @private
+ * @name has
+ * @memberOf MapCache
+ * @param {string} key The key of the entry to check.
+ * @returns {boolean} Returns `true` if an entry for `key` exists, else `false`.
+ */
+function mapCacheHas(key) {
+  return getMapData(this, key).has(key);
+}
+
+/**
+ * Sets the map `key` to `value`.
+ *
+ * @private
+ * @name set
+ * @memberOf MapCache
+ * @param {string} key The key of the value to set.
+ * @param {*} value The value to set.
+ * @returns {Object} Returns the map cache instance.
+ */
+function mapCacheSet(key, value) {
+  getMapData(this, key).set(key, value);
+  return this;
+}
+
+// Add methods to `MapCache`.
+MapCache.prototype.clear = mapCacheClear;
+MapCache.prototype['delete'] = mapCacheDelete;
+MapCache.prototype.get = mapCacheGet;
+MapCache.prototype.has = mapCacheHas;
+MapCache.prototype.set = mapCacheSet;
+
+/**
+ * Gets the index at which the `key` is found in `array` of key-value pairs.
+ *
+ * @private
+ * @param {Array} array The array to inspect.
+ * @param {*} key The key to search for.
+ * @returns {number} Returns the index of the matched value, else `-1`.
+ */
+function assocIndexOf(array, key) {
+  var length = array.length;
+  while (length--) {
+    if (eq(array[length][0], key)) {
+      return length;
+    }
+  }
+  return -1;
+}
+
+/**
+ * The base implementation of `_.get` without support for default values.
+ *
+ * @private
+ * @param {Object} object The object to query.
+ * @param {Array|string} path The path of the property to get.
+ * @returns {*} Returns the resolved value.
+ */
+function baseGet(object, path) {
+  path = isKey(path, object) ? [path] : castPath(path);
+
+  var index = 0,
+      length = path.length;
+
+  while (object != null && index < length) {
+    object = object[toKey(path[index++])];
+  }
+  return (index && index == length) ? object : undefined;
+}
+
+/**
+ * The base implementation of `_.isNative` without bad shim checks.
+ *
+ * @private
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a native function,
+ *  else `false`.
+ */
+function baseIsNative(value) {
+  if (!isObject(value) || isMasked(value)) {
+    return false;
+  }
+  var pattern = (isFunction(value) || isHostObject(value)) ? reIsNative : reIsHostCtor;
+  return pattern.test(toSource(value));
+}
+
+/**
+ * The base implementation of `_.toString` which doesn't convert nullish
+ * values to empty strings.
+ *
+ * @private
+ * @param {*} value The value to process.
+ * @returns {string} Returns the string.
+ */
+function baseToString(value) {
+  // Exit early for strings to avoid a performance hit in some environments.
+  if (typeof value == 'string') {
+    return value;
+  }
+  if (isSymbol(value)) {
+    return symbolToString ? symbolToString.call(value) : '';
+  }
+  var result = (value + '');
+  return (result == '0' && (1 / value) == -INFINITY) ? '-0' : result;
+}
+
+/**
+ * Casts `value` to a path array if it's not one.
+ *
+ * @private
+ * @param {*} value The value to inspect.
+ * @returns {Array} Returns the cast property path array.
+ */
+function castPath(value) {
+  return isArray(value) ? value : stringToPath(value);
+}
+
+/**
+ * Gets the data for `map`.
+ *
+ * @private
+ * @param {Object} map The map to query.
+ * @param {string} key The reference key.
+ * @returns {*} Returns the map data.
+ */
+function getMapData(map, key) {
+  var data = map.__data__;
+  return isKeyable(key)
+    ? data[typeof key == 'string' ? 'string' : 'hash']
+    : data.map;
+}
+
+/**
+ * Gets the native function at `key` of `object`.
+ *
+ * @private
+ * @param {Object} object The object to query.
+ * @param {string} key The key of the method to get.
+ * @returns {*} Returns the function if it's native, else `undefined`.
+ */
+function getNative(object, key) {
+  var value = getValue(object, key);
+  return baseIsNative(value) ? value : undefined;
+}
+
+/**
+ * Checks if `value` is a property name and not a property path.
+ *
+ * @private
+ * @param {*} value The value to check.
+ * @param {Object} [object] The object to query keys on.
+ * @returns {boolean} Returns `true` if `value` is a property name, else `false`.
+ */
+function isKey(value, object) {
+  if (isArray(value)) {
+    return false;
+  }
+  var type = typeof value;
+  if (type == 'number' || type == 'symbol' || type == 'boolean' ||
+      value == null || isSymbol(value)) {
+    return true;
+  }
+  return reIsPlainProp.test(value) || !reIsDeepProp.test(value) ||
+    (object != null && value in Object(object));
+}
+
+/**
+ * Checks if `value` is suitable for use as unique object key.
+ *
+ * @private
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is suitable, else `false`.
+ */
+function isKeyable(value) {
+  var type = typeof value;
+  return (type == 'string' || type == 'number' || type == 'symbol' || type == 'boolean')
+    ? (value !== '__proto__')
+    : (value === null);
+}
+
+/**
+ * Checks if `func` has its source masked.
+ *
+ * @private
+ * @param {Function} func The function to check.
+ * @returns {boolean} Returns `true` if `func` is masked, else `false`.
+ */
+function isMasked(func) {
+  return !!maskSrcKey && (maskSrcKey in func);
+}
+
+/**
+ * Converts `string` to a property path array.
+ *
+ * @private
+ * @param {string} string The string to convert.
+ * @returns {Array} Returns the property path array.
+ */
+var stringToPath = memoize(function(string) {
+  string = toString(string);
+
+  var result = [];
+  if (reLeadingDot.test(string)) {
+    result.push('');
+  }
+  string.replace(rePropName, function(match, number, quote, string) {
+    result.push(quote ? string.replace(reEscapeChar, '$1') : (number || match));
+  });
+  return result;
+});
+
+/**
+ * Converts `value` to a string key if it's not a string or symbol.
+ *
+ * @private
+ * @param {*} value The value to inspect.
+ * @returns {string|symbol} Returns the key.
+ */
+function toKey(value) {
+  if (typeof value == 'string' || isSymbol(value)) {
+    return value;
+  }
+  var result = (value + '');
+  return (result == '0' && (1 / value) == -INFINITY) ? '-0' : result;
+}
+
+/**
+ * Converts `func` to its source code.
+ *
+ * @private
+ * @param {Function} func The function to process.
+ * @returns {string} Returns the source code.
+ */
+function toSource(func) {
+  if (func != null) {
+    try {
+      return funcToString.call(func);
+    } catch (e) {}
+    try {
+      return (func + '');
+    } catch (e) {}
+  }
+  return '';
+}
+
+/**
+ * Creates a function that memoizes the result of `func`. If `resolver` is
+ * provided, it determines the cache key for storing the result based on the
+ * arguments provided to the memoized function. By default, the first argument
+ * provided to the memoized function is used as the map cache key. The `func`
+ * is invoked with the `this` binding of the memoized function.
+ *
+ * **Note:** The cache is exposed as the `cache` property on the memoized
+ * function. Its creation may be customized by replacing the `_.memoize.Cache`
+ * constructor with one whose instances implement the
+ * [`Map`](http://ecma-international.org/ecma-262/7.0/#sec-properties-of-the-map-prototype-object)
+ * method interface of `delete`, `get`, `has`, and `set`.
+ *
+ * @static
+ * @memberOf _
+ * @since 0.1.0
+ * @category Function
+ * @param {Function} func The function to have its output memoized.
+ * @param {Function} [resolver] The function to resolve the cache key.
+ * @returns {Function} Returns the new memoized function.
+ * @example
+ *
+ * var object = { 'a': 1, 'b': 2 };
+ * var other = { 'c': 3, 'd': 4 };
+ *
+ * var values = _.memoize(_.values);
+ * values(object);
+ * // => [1, 2]
+ *
+ * values(other);
+ * // => [3, 4]
+ *
+ * object.a = 2;
+ * values(object);
+ * // => [1, 2]
+ *
+ * // Modify the result cache.
+ * values.cache.set(object, ['a', 'b']);
+ * values(object);
+ * // => ['a', 'b']
+ *
+ * // Replace `_.memoize.Cache`.
+ * _.memoize.Cache = WeakMap;
+ */
+function memoize(func, resolver) {
+  if (typeof func != 'function' || (resolver && typeof resolver != 'function')) {
+    throw new TypeError(FUNC_ERROR_TEXT);
+  }
+  var memoized = function() {
+    var args = arguments,
+        key = resolver ? resolver.apply(this, args) : args[0],
+        cache = memoized.cache;
+
+    if (cache.has(key)) {
+      return cache.get(key);
+    }
+    var result = func.apply(this, args);
+    memoized.cache = cache.set(key, result);
+    return result;
+  };
+  memoized.cache = new (memoize.Cache || MapCache);
+  return memoized;
+}
+
+// Assign cache to `_.memoize`.
+memoize.Cache = MapCache;
+
+/**
+ * Performs a
+ * [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero)
+ * comparison between two values to determine if they are equivalent.
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category Lang
+ * @param {*} value The value to compare.
+ * @param {*} other The other value to compare.
+ * @returns {boolean} Returns `true` if the values are equivalent, else `false`.
+ * @example
+ *
+ * var object = { 'a': 1 };
+ * var other = { 'a': 1 };
+ *
+ * _.eq(object, object);
+ * // => true
+ *
+ * _.eq(object, other);
+ * // => false
+ *
+ * _.eq('a', 'a');
+ * // => true
+ *
+ * _.eq('a', Object('a'));
+ * // => false
+ *
+ * _.eq(NaN, NaN);
+ * // => true
+ */
+function eq(value, other) {
+  return value === other || (value !== value && other !== other);
+}
+
+/**
+ * Checks if `value` is classified as an `Array` object.
+ *
+ * @static
+ * @memberOf _
+ * @since 0.1.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is an array, else `false`.
+ * @example
+ *
+ * _.isArray([1, 2, 3]);
+ * // => true
+ *
+ * _.isArray(document.body.children);
+ * // => false
+ *
+ * _.isArray('abc');
+ * // => false
+ *
+ * _.isArray(_.noop);
+ * // => false
+ */
+var isArray = Array.isArray;
+
+/**
+ * Checks if `value` is classified as a `Function` object.
+ *
+ * @static
+ * @memberOf _
+ * @since 0.1.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a function, else `false`.
+ * @example
+ *
+ * _.isFunction(_);
+ * // => true
+ *
+ * _.isFunction(/abc/);
+ * // => false
+ */
+function isFunction(value) {
+  // The use of `Object#toString` avoids issues with the `typeof` operator
+  // in Safari 8-9 which returns 'object' for typed array and other constructors.
+  var tag = isObject(value) ? objectToString.call(value) : '';
+  return tag == funcTag || tag == genTag;
+}
+
+/**
+ * Checks if `value` is the
+ * [language type](http://www.ecma-international.org/ecma-262/7.0/#sec-ecmascript-language-types)
+ * of `Object`. (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
+ *
+ * @static
+ * @memberOf _
+ * @since 0.1.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is an object, else `false`.
+ * @example
+ *
+ * _.isObject({});
+ * // => true
+ *
+ * _.isObject([1, 2, 3]);
+ * // => true
+ *
+ * _.isObject(_.noop);
+ * // => true
+ *
+ * _.isObject(null);
+ * // => false
+ */
+function isObject(value) {
+  var type = typeof value;
+  return !!value && (type == 'object' || type == 'function');
+}
+
+/**
+ * Checks if `value` is object-like. A value is object-like if it's not `null`
+ * and has a `typeof` result of "object".
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
+ * @example
+ *
+ * _.isObjectLike({});
+ * // => true
+ *
+ * _.isObjectLike([1, 2, 3]);
+ * // => true
+ *
+ * _.isObjectLike(_.noop);
+ * // => false
+ *
+ * _.isObjectLike(null);
+ * // => false
+ */
+function isObjectLike(value) {
+  return !!value && typeof value == 'object';
+}
+
+/**
+ * Checks if `value` is classified as a `Symbol` primitive or object.
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a symbol, else `false`.
+ * @example
+ *
+ * _.isSymbol(Symbol.iterator);
+ * // => true
+ *
+ * _.isSymbol('abc');
+ * // => false
+ */
+function isSymbol(value) {
+  return typeof value == 'symbol' ||
+    (isObjectLike(value) && objectToString.call(value) == symbolTag);
+}
+
+/**
+ * Converts `value` to a string. An empty string is returned for `null`
+ * and `undefined` values. The sign of `-0` is preserved.
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category Lang
+ * @param {*} value The value to process.
+ * @returns {string} Returns the string.
+ * @example
+ *
+ * _.toString(null);
+ * // => ''
+ *
+ * _.toString(-0);
+ * // => '-0'
+ *
+ * _.toString([1, 2, 3]);
+ * // => '1,2,3'
+ */
+function toString(value) {
+  return value == null ? '' : baseToString(value);
+}
+
+/**
+ * Gets the value at `path` of `object`. If the resolved value is
+ * `undefined`, the `defaultValue` is returned in its place.
+ *
+ * @static
+ * @memberOf _
+ * @since 3.7.0
+ * @category Object
+ * @param {Object} object The object to query.
+ * @param {Array|string} path The path of the property to get.
+ * @param {*} [defaultValue] The value returned for `undefined` resolved values.
+ * @returns {*} Returns the resolved value.
+ * @example
+ *
+ * var object = { 'a': [{ 'b': { 'c': 3 } }] };
+ *
+ * _.get(object, 'a[0].b.c');
+ * // => 3
+ *
+ * _.get(object, ['a', '0', 'b', 'c']);
+ * // => 3
+ *
+ * _.get(object, 'a.b.c', 'default');
+ * // => 'default'
+ */
+function get(object, path, defaultValue) {
+  var result = object == null ? undefined : baseGet(object, path);
+  return result === undefined ? defaultValue : result;
+}
+
+var lodash_get = get;
+
+/*
+ * Copyright 2018 Brigham Young University
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+const pickFirst = (acc, curr) => acc || curr;
+
+function parseLinks (links) {
+  const next = lodash_get(links, 'persons__next.href');
+  const prev = lodash_get(links, 'persons__prev.href');
+  return { next, prev }
+}
+
+function parseAddresses (addresses) {
+  if (addresses.metadata.validation_response.code !== 200) {
+    return null
+  }
+  return addresses.values
+    .filter(address => address.metadata.validation_response.code === 200)
+    .reduce((all, c) => {
+      const data = [
+        lodash_get(c, 'address_line_1.value', ''),
+        lodash_get(c, 'address_line_2.value', ''),
+        lodash_get(c, 'address_line_3.value', ''),
+        lodash_get(c, 'address_line_4.value', '')
+      ].filter(l => l.trim().length > 0);
+      const key = {
+        'MAL': 'mailing',
+        'RES': 'residential',
+        'WRK': 'work',
+        'PRM': 'permanent'
+      }[c.address_type.value] || c.address_type.value;
+      return Object.assign({}, all, { [key]: data })
+    }, {})
+}
+
+function parseBasic (basic) {
+  const name = lodash_get(basic, 'name_lnf.value', '');
+  const byuId = lodash_get(basic, 'byu_id.value', '');
+  const netId = lodash_get(basic, 'net_id.value', '');
+  const personId = lodash_get(basic, 'person_id.value', '');
+  return {
+    name,
+    byuId,
+    netId,
+    personId
+  }
+}
+
+function parseEmailAddresses (emailAddresses) {
+  if (emailAddresses.metadata.validation_response.code !== 200) {
+    return null
+  }
+  return emailAddresses.values.map(e => lodash_get(e, 'email_address.value', ''))
+    .filter(e => !!e)
+    .reduce(pickFirst, '')
+}
+
+function parsePhones (phones) {
+  if (phones.metadata.validation_response.code !== 200) {
+    return null
+  }
+  return phones.values.map(p => lodash_get(p, 'phone_number.value', ''))
+    .filter(p => !!p)
+    .reduce(pickFirst, '')
+}
+
+function parseEmployeeSummaries (employeeSummaries) {
+  if (employeeSummaries.metadata.validation_response.code !== 200) {
+    return null
+  }
+  return {
+    employeeStatus: lodash_get(employeeSummaries, 'employee_role.value'),
+    department: lodash_get(employeeSummaries, 'department.value'),
+    jobTitle: lodash_get(employeeSummaries, 'job_title.description')
+  }
+}
+
+function parseStudentSummaries (studentSummaries) {
+  if (studentSummaries.metadata.validation_response.code !== 200) {
+    return null
+  }
+  const studentStatus = lodash_get(studentSummaries, 'student_status.value');
+  return { studentStatus }
+}
+
+function pickAddress (addrs) {
+  if (!addrs) return []
+  if (addrs.mailing) return addrs.mailing
+  if (addrs.residential) return addrs.mailing
+  if (addrs.permanent) return addrs.permanent
+  return []
+}
+
+function isEmployee (results) {
+  if (results.employeeStatus) {
+    return /ACT|LEV/.test(results.employeeStatus)
+  }
+  return results.department && results.jobTitle
+}
+
+function buildAdditionalInfo (results) {
+  const workAddress = results.addresses.work ? results.addresses.work : [];
+  return [
+    results.department,
+    results.jobTitle,
+    ...workAddress
+  ]
+}
+
+function parsePerson (data) {
+  const results = Object.assign(
+    {
+      addresses: parseAddresses(data.addresses),
+      email: parseEmailAddresses(data.email_addresses),
+      phone: parsePhones(data.phones)
+    },
+    parseBasic(data.basic),
+    parseEmployeeSummaries(data.employee_summary),
+    parseStudentSummaries(data.student_summary)
+  );
+  const address = pickAddress(results.addresses);
+  const {
+    email,
+    phone,
+    name,
+    byuId,
+    netId,
+    employeeStatus,
+    studentStatus
+  } = results;
+  const showAdditionalInfo = isEmployee(results);
+  const additionalInfo = showAdditionalInfo ? buildAdditionalInfo(results) : [];
+  return {
+    address,
+    email,
+    phone,
+    name,
+    byuId,
+    netId,
+    employeeStatus,
+    studentStatus,
+    showAdditionalInfo,
+    additionalInfo
+  }
+}
+
+function parsePersonV3 (data) {
+  const people = data.values.map(parsePerson);
+  const { next, prev } = parseLinks(data.links);
+  return { next, prev, people }
+}
+
+/*
+ * Copyright 2018 Brigham Young University
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+let authHeader = null;
+let observer = null;
+
+function connect () {
+  if (!observer) {
+    observer = new AuthenticationObserver(({ state: state$$1, token: token$$1, user: user$$1, error }) => {
+      // React to change
+      authHeader = token$$1 ? token$$1.authorizationHeader : null;
+    });
+  }
+}
+
+function nameParams (search) {
+  let surname = '';
+  let restOfName = '';
+  if (/,/.test(search)) {
+    // Assume 'Last, First'
+    [surname, restOfName] = search.split(',').map(s => s.trim());
+  } else {
+    // Assume 'First Middle Last'
+    const words = search.split(' ');
+    surname = words.slice(-1);
+    restOfName = words.slice(0, -1).join(' ');
+  }
+  return `?surname=${surname}&rest_of_name=${restOfName}`
+}
+
+function resolveSearchType (search) {
+  return search.length < 1
+    ? { q: `?surname=${search}`, label: 'Search' }
+    : /^\d{3,9}$/.test(search)
+      ? { q: `?byu_ids=${search}`, label: 'BYU ID' }
+      : /^[a-z][a-z0-9]{2,7}$/.test(search)
+        ? { q: `?net_ids=${search}`, label: 'Net ID' }
+        : /^[^@]+@.+$/.test(search)
+          ? { q: `?email_addresses.email_address=${search}`, label: 'Email' }
+          : /^[^ ]+ +[^ ]+[^0-9]*$/.test(search)
+            ? { q: `${nameParams(search)}`, label: 'Name' }
+            : { q: `?surname=${search}`, label: 'Name' }
+}
+
+async function search (searchText, pageLink) {
+  if (!authHeader) {
+    throw new Error('Not authenticated!')
+  }
+
+  const { q } = resolveSearchType(searchText);
+
+  const apiBase = 'https://api.byu.edu:443/byuapi/persons/v3/';
+
+  const init = {
+    method: 'GET',
+    headers: new window.Headers({ 'Authorization': authHeader })
+  };
+
+  const fieldSets = 'basic,addresses,email_addresses,phones,employee_summary,student_summary';
+
+  const url = pageLink || `${apiBase}${q}&field_sets=${fieldSets}&page_size=50`;
+
+  const response = await window.fetch(url, init);
+
+  if (response.ok) {
+    const json = await response.json();
+    return parsePersonV3(json)
+  } else if (response.status === 404) {
+    return {}
+  }
+
+  const message = `Error ${response.status} while querying personsv3`;
+  throw new Error(message)
+}
+
+// in disconnectedCallback():
+function disconnect () {
+  if (observer) {
+    observer.disconnect();
+  }
+  observer = null;
+}
+
 /**
  * @license
  * Copyright (c) 2017 The Polymer Project Authors. All rights reserved.
@@ -35,20 +1277,6 @@ const isDirective = (o) => {
 const isCEPolyfill = window.customElements !== undefined &&
     window.customElements.polyfillWrapFlushCallback !==
         undefined;
-/**
- * Reparents nodes, starting from `startNode` (inclusive) to `endNode`
- * (exclusive), into another container (could be the same container), before
- * `beforeNode`. If `beforeNode` is null, it appends the nodes to the
- * container.
- */
-const reparentNodes = (container, start, end = null, before = null) => {
-    let node = start;
-    while (node !== end) {
-        const n = node.nextSibling;
-        container.insertBefore(node, before);
-        node = n;
-    }
-};
 /**
  * Removes nodes, starting from `startNode` (inclusive) to `endNode`
  * (exclusive), from `container`.
@@ -431,26 +1659,6 @@ class TemplateResult {
     getTemplateElement() {
         const template = document.createElement('template');
         template.innerHTML = this.getHTML();
-        return template;
-    }
-}
-/**
- * A TemplateResult for SVG fragments.
- *
- * This class wraps HTMl in an `<svg>` tag in order to parse its contents in the
- * SVG namespace, then modifies the template to remove the `<svg>` tag so that
- * clones only container the original fragment.
- */
-class SVGTemplateResult extends TemplateResult {
-    getHTML() {
-        return `<svg>${super.getHTML()}</svg>`;
-    }
-    getTemplateElement() {
-        const template = super.getTemplateElement();
-        const content = template.content;
-        const svgElement = content.firstChild;
-        content.removeChild(svgElement);
-        reparentNodes(content, svgElement.firstChild);
         return template;
     }
 }
@@ -1039,11 +2247,6 @@ const render = (result, container, options) => {
  * render to and update a container.
  */
 const html = (strings, ...values) => new TemplateResult(strings, values, 'html', defaultTemplateProcessor);
-/**
- * Interprets a template literal as an SVG template that can efficiently
- * render to and update a container.
- */
-const svg = (strings, ...values) => new SVGTemplateResult(strings, values, 'svg', defaultTemplateProcessor);
 
 /**
  * @license
@@ -2000,37 +3203,6 @@ part of the polymer project is also subject to an additional IP rights grant
 found at http://polymer.github.io/PATENTS.txt
 */
 const supportsAdoptingStyleSheets = ('adoptedStyleSheets' in Document.prototype);
-class CSSResult {
-    constructor(cssText) { this.cssText = cssText; }
-    // Note, this is a getter so that it's lazy. In practice, this means
-    // stylesheets are not created until the first element instance is made.
-    get styleSheet() {
-        if (this._styleSheet === undefined) {
-            // Note, if `adoptedStyleSheets` is supported then we assume CSSStyleSheet
-            // is constructable.
-            if (supportsAdoptingStyleSheets) {
-                this._styleSheet = new CSSStyleSheet();
-                this._styleSheet.replaceSync(this.cssText);
-            }
-            else {
-                this._styleSheet = null;
-            }
-        }
-        return this._styleSheet;
-    }
-}
-const textFromCSSResult = (value) => {
-    if (value instanceof CSSResult) {
-        return value.cssText;
-    }
-    else {
-        throw new Error(`Value passed to 'css' function must be a 'css' function result: ${value}.`);
-    }
-};
-const css = (strings, ...values) => {
-    const cssText = values.reduce((acc, v, idx) => acc + textFromCSSResult(v) + strings[idx + 1], strings[0]);
-    return new CSSResult(cssText);
-};
 
 /**
  * @license
@@ -2182,24 +3354,6 @@ LitElement.finalized = true;
  */
 LitElement.render = render$1;
 
-var faSearch = { prefix: 'fas', iconName: 'search', icon: [512, 512, [], "f002", "M505 442.7L405.3 343c-4.5-4.5-10.6-7-17-7H372c27.6-35.3 44-79.7 44-128C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c48.3 0 92.7-16.4 128-44v16.3c0 6.4 2.5 12.5 7 17l99.7 99.7c9.4 9.4 24.6 9.4 33.9 0l28.3-28.3c9.4-9.4 9.4-24.6.1-34zM208 336c-70.7 0-128-57.2-128-128 0-70.7 57.2-128 128-128 70.7 0 128 57.2 128 128 0 70.7-57.2 128-128 128z"] };
-
-var faSpinner = { prefix: 'fas', iconName: 'spinner', icon: [512, 512, [], "f110", "M304 48c0 26.51-21.49 48-48 48s-48-21.49-48-48 21.49-48 48-48 48 21.49 48 48zm-48 368c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zm208-208c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zM96 256c0-26.51-21.49-48-48-48S0 229.49 0 256s21.49 48 48 48 48-21.49 48-48zm12.922 99.078c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.491-48-48-48zm294.156 0c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.49-48-48-48zM108.922 60.922c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.491-48-48-48z"] };
-
-var faBan = { prefix: 'fas', iconName: 'ban', icon: [512, 512, [], "f05e", "M256 8C119.034 8 8 119.033 8 256s111.034 248 248 248 248-111.034 248-248S392.967 8 256 8zm130.108 117.892c65.448 65.448 70 165.481 20.677 235.637L150.47 105.216c70.204-49.356 170.226-44.735 235.638 20.676zM125.892 386.108c-65.448-65.448-70-165.481-20.677-235.637L361.53 406.784c-70.203 49.356-170.226 44.736-235.638-20.676z"] };
-
-var faExclamationTriangle = { prefix: 'fas', iconName: 'exclamation-triangle', icon: [576, 512, [], "f071", "M569.517 440.013C587.975 472.007 564.806 512 527.94 512H48.054c-36.937 0-59.999-40.055-41.577-71.987L246.423 23.985c18.467-32.009 64.72-31.951 83.154 0l239.94 416.028zM288 354c-25.405 0-46 20.595-46 46s20.595 46 46 46 46-20.595 46-46-20.595-46-46-46zm-43.673-165.346l7.418 136c.347 6.364 5.609 11.346 11.982 11.346h48.546c6.373 0 11.635-4.982 11.982-11.346l7.418-136c.375-6.874-5.098-12.654-11.982-12.654h-63.383c-6.884 0-12.356 5.78-11.981 12.654z"] };
-
-var faQuestionCircle = { prefix: 'fas', iconName: 'question-circle', icon: [512, 512, [], "f059", "M504 256c0 136.997-111.043 248-248 248S8 392.997 8 256C8 119.083 119.043 8 256 8s248 111.083 248 248zM262.655 90c-54.497 0-89.255 22.957-116.549 63.758-3.536 5.286-2.353 12.415 2.715 16.258l34.699 26.31c5.205 3.947 12.621 3.008 16.665-2.122 17.864-22.658 30.113-35.797 57.303-35.797 20.429 0 45.698 13.148 45.698 32.958 0 14.976-12.363 22.667-32.534 33.976C247.128 238.528 216 254.941 216 296v4c0 6.627 5.373 12 12 12h56c6.627 0 12-5.373 12-12v-1.333c0-28.462 83.186-29.647 83.186-106.667 0-58.002-60.165-102-116.531-102zM256 338c-25.365 0-46 20.635-46 46 0 25.364 20.635 46 46 46s46-20.636 46-46c0-25.365-20.635-46-46-46z"] };
-
-var faTimes = { prefix: 'fas', iconName: 'times', icon: [352, 512, [], "f00d", "M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"] };
-
-var faEnvelope = { prefix: 'fas', iconName: 'envelope', icon: [512, 512, [], "f0e0", "M502.3 190.8c3.9-3.1 9.7-.2 9.7 4.7V400c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V195.6c0-5 5.7-7.8 9.7-4.7 22.4 17.4 52.1 39.5 154.1 113.6 21.1 15.4 56.7 47.8 92.2 47.6 35.7.3 72-32.8 92.3-47.6 102-74.1 131.6-96.3 154-113.7zM256 320c23.2.4 56.6-29.2 73.4-41.4 132.7-96.3 142.8-104.7 173.4-128.7 5.8-4.5 9.2-11.5 9.2-18.9v-19c0-26.5-21.5-48-48-48H48C21.5 64 0 85.5 0 112v19c0 7.4 3.4 14.3 9.2 18.9 30.6 23.9 40.7 32.4 173.4 128.7 16.8 12.2 50.2 41.8 73.4 41.4z"] };
-
-var faPhone = { prefix: 'fas', iconName: 'phone', icon: [512, 512, [], "f095", "M493.4 24.6l-104-24c-11.3-2.6-22.9 3.3-27.5 13.9l-48 112c-4.2 9.8-1.4 21.3 6.9 28l60.6 49.6c-36 76.7-98.9 140.5-177.2 177.2l-49.6-60.6c-6.8-8.3-18.2-11.1-28-6.9l-112 48C3.9 366.5-2 378.1.6 389.4l24 104C27.1 504.2 36.7 512 48 512c256.1 0 464-207.5 464-464 0-11.2-7.7-20.9-18.6-23.4z"] };
-
-var faHome = { prefix: 'fas', iconName: 'home', icon: [576, 512, [], "f015", "M488 312.7V456c0 13.3-10.7 24-24 24H348c-6.6 0-12-5.4-12-12V356c0-6.6-5.4-12-12-12h-72c-6.6 0-12 5.4-12 12v112c0 6.6-5.4 12-12 12H112c-13.3 0-24-10.7-24-24V312.7c0-3.6 1.6-7 4.4-9.3l188-154.8c4.4-3.6 10.8-3.6 15.3 0l188 154.8c2.7 2.3 4.3 5.7 4.3 9.3zm83.6-60.9L488 182.9V44.4c0-6.6-5.4-12-12-12h-56c-6.6 0-12 5.4-12 12V117l-89.5-73.7c-17.7-14.6-43.3-14.6-61 0L4.4 251.8c-5.1 4.2-5.8 11.8-1.6 16.9l25.5 31c4.2 5.1 11.8 5.8 16.9 1.6l235.2-193.7c4.4-3.6 10.8-3.6 15.3 0l235.2 193.7c5.1 4.2 12.7 3.5 16.9-1.6l25.5-31c4.2-5.2 3.4-12.7-1.7-16.9z"] };
-
 /*
  * Copyright 2018 Brigham Young University
  *
@@ -2216,797 +3370,101 @@ var faHome = { prefix: 'fas', iconName: 'home', icon: [576, 512, [], "f015", "M4
  * limitations under the License.
  */
 
-const { IntersectionObserver, CustomEvent } = window;
+const { CustomEvent: CustomEvent$1 } = window;
 
-class ByuPersonLookupResults extends LitElement {
-  static get properties () {
-    return {
-      results: { type: Array },
-      context: { type: String },
-      noAutoselect: { type: Boolean },
-      searchPending: { type: Boolean }
-    }
+const executePersonsv3Request = async (search$$1, target, pageLink) => {
+  try {
+    const { next, prev, people } = await search(search$$1, pageLink);
+    target.dispatchEvent(new CustomEvent$1('byu-lookup-datasource-result', {
+      bubbles: true,
+      detail: people
+    }));
+    return { next, prev }
+  } catch (err) {
+    console.error(err);
+    target.dispatchEvent(new CustomEvent$1('byu-lookup-datasource-error', {
+      bubbles: true,
+      detail: err
+    }));
+    return { next: null, prev: null }
   }
+};
 
-  static get styles () {
-    return [css`
-      :host {
-        display: block;
-      }
-      :host[hidden] {
-        display: none;
-      }
-      .modal {
-        z-index: 98;
-        background-color: rgba(0, 0, 0, 0.6);
-        position: fixed;
-        left: 0;
-        right: 0;
-        top: 0;
-        bottom: 0;
-      }
-      .results {
-        z-index: 99;
-        position: fixed;
-        left: 0;
-        right: 0;
-        top: 20vh;
-        bottom: 0;
-        padding: 0.5rem;
-        background-color: white;
-        color: #141414;
-        display: grid;
-        grid-template-columns: 1fr;
-        grid-template-rows: auto auto 1fr auto;
-        grid-gap: 0.5rem;
-        overflow: auto;
-      }
-      .close-modal {
-        z-index: 100;
-        position: fixed;
-        right: 0;
-        top: calc(20vh - 2rem);
-        border-radius: 50%;
-        display: inline-flex;
-        justify-content: center;
-        align-items: center;
-        padding: 0.3rem;
-        border: 1px solid #5199E1;
-        cursor: pointer;
-        box-shadow: 0rem 0rem 1rem #5199E1;
-      }
-      h2 {
-        margin: 0;
-      }
-      table {
-        border-collapse: collapse;
-      }
-      th, td {
-        padding: 0.5rem;
-        border-bottom: 1px solid #666666;
-      }
-      th {
-        text-align: left;
-        background-color: #0057B8;
-        color: white;
-        padding: 1rem;
-      }
-      tbody tr { cursor: pointer; }
-      tbody tr:nth-child(odd) {
-        background-color: #E6E6E6;
-      }
-      tbody tr.placeholder { cursor: default; }
-      ol, ul {
-        margin: 0;
-        padding: 0;
-        display: inline-flex;
-        flex-direction: column;
-      }
-      li {
-        list-style-type: none;
-        margin: 0;
-      }
-      .nav-btn {
-        padding: 0.3rem 1rem;
-        border: thin solid #666666;
-        border-radius: 0.05rem;
-        color: white;
-        cursor: pointer;
-        justify-self: start;
-        align-self: center;
-      }
-      button {
-        font-size: 1.1rem;
-        background-color: #0057B8;
-      }
-      button:hover, button:active {
-        box-shadow: inset 0 0 0.2rem rgba(255, 255, 255, 0.5);
-        background-color: #5199E1;
-      }
-      .deck {
-        display: grid;
-        grid-template-columns: 1fr;
-        grid-auto-rows: auto;
-        grid-gap: 1rem;
-      }
-      .card {
-        border: thin solid #666666;
-        border-left: 0.5rem solid #002E5D;
-        padding: 0.5rem;
-        display: grid;
-        grid-template-columns: 1fr;
-        grid-auto-rows: auto;
-        grid-gap: 0.5rem;
-        cursor: pointer;
-      }
-      .card h3 {
-        margin: 0;
-      }
-      .contact {
-        display: flex;
-        flex-direction: column;
-      }
-      .contact div {
-        display: inline-grid;
-        grid-template-columns: auto 1fr;
-        grid-gap: 0.25rem;
-      }
-      .contact div svg {
-        margin-top: calc(1rem - 14px);
-      }
-      .card.placeholder { cursor: default; }
-      svg.placeholder { filter: blur(1px); width: 100%; height: 6rem; }
-      tr.placeholder svg.placeholder { width: 100%; max-height: 1rem; }
-      svg.placeholder rect {
-        animation: pulse 1000ms ease-in-out infinite alternate;
-      }
-      @keyframes pulse {
-        from { fill: #999999; }
-        70% { fill: #999999; }
-        to { fill: #B3B5B7; }
-      }
-      @media only screen and (min-width: 650px) {
-        .deck {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(28rem, 1fr));
-          grid-auto-rows: auto;
-          grid-gap: 1rem;
-        }
-        .card {
-          border: thin solid #666666;
-          border-left: 0.5rem solid #002E5D;
-          padding: 0.5rem;
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          grid-template-rows: auto auto;
-          grid-gap: 0.5rem;
-          cursor: pointer;
-        }
-        .card h3 {
-          margin: 0;
-          grid-column: 1/-1;
-        }
-      }
-      @media only screen and (min-width: 900px) {
-        .results {
-          left: 10vw;
-          right: 10vw;
-          top: 10vh;
-          max-height: 85vh;
-        }
-        .close-modal {
-          right: calc(10vw - 2rem);
-          top: calc(10vh - 2rem);
-        }
-      }
-    `]
-  }
+const setPendingSearch = (target) => {
+  const evtType = 'byu-lookup-datasource-searching';
+  const evt = new CustomEvent$1(evtType, { bubbles: true });
+  target.dispatchEvent(evt);
+};
 
-  constructor () {
-    super();
-    this.results = null;
-    this.context = 'directory';
-    this.noAutoselect = false;
-    this.searchPending = false;
-    this.isObserving = false;
-  }
-
-  updated (changedProperties) {
-    /*
-     * changedProperties.forEach((oldValue, propName) => {
-     *   console.log(`lookup-results::property changed!
-     *     ${propName}: '${oldValue}' => '${this[propName]}'`)
-     * })
-     */
-    if (this.results && this.results.length === 1 && !this.noAutoselect) {
-      // Do Autoselect
-      return this.select(this.results[0])
-    }
-    if (this.results && this.results.length > 0 && !this.isObserving) {
-      // console.log('lookup-results::set up intersection observer')
-      const top = this.shadowRoot.getElementById('top');
-      const bottom = this.shadowRoot.getElementById('bottom');
-      if (!IntersectionObserver || !top || !bottom) {
-        return
-      }
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (!entry.isIntersecting) {
-            return
-          }
-          if (entry.target === bottom) {
-            // console.log(`IntersectionObserver::callback:nextPage`)
-            this.next();
-          } else if (entry.target === top) {
-            // console.log(`IntersectionObserver::callback:prevPage`)
-            this.prev();
-          }
-        });
-      }, {});
-      // observer.observe(top)
-      // console.log('lookup-results::observing!', bottom)
-      observer.observe(bottom);
-      this.isObserving = true;
-    }
-  }
-
-  render () {
-    // console.log(`byu-person-lookup-results::_render::searchPending=${searchPending}`)
-
-    const renderPlaceholderRows = () => [1, 2, 3, 4, 5, 6].map(() => html`
-      <tr class="placeholder"><td colspan="5">
-        <svg class="placeholder" viewBox="0 0 100 5" preserveAspectRatio="none">
-          ${svg`<rect x="1" y="1" width="98" height="3" fill="#999999"></rect>`}
-        </svg>
-      </td></tr>
-    `);
-
-    const renderPlaceholderCards = () => [1, 2, 3, 4, 5, 6].map(() => html`
-      <div class="card placeholder">
-        <svg class="placeholder" viewBox="0 0 50 40" preserveAspectRatio="none">
-          <rect x="1" y="1" width="40" height="15" fill="#999999"></rect>
-          <rect x="1" y="25" width="45" height="5" fill="#999999"></rect>
-          <rect x="1" y="33" width="30" height="5" fill="#999999"></rect>
-        </svg>
-        <svg class="placeholder" viewBox="0 0 50 40" preserveAspectRatio="none">
-          <rect x="1" y="17" width="45" height="5" fill="#999999"></rect>
-          <rect x="1" y="25" width="30" height="5" fill="#999999"></rect>
-          <rect x="1" y="33" width="35" height="5" fill="#999999"></rect>
-        </svg>
-      </div>
-    `);
-
-    const renderAddress = address => html`
-      <ul>
-        ${address.map(line => html`<li>${line}</li>`)}
-      </ul>
-    `;
-
-    const renderAdminRow = row => html`
-      <tr @click=${e => this.select(row)}>
-        <td>${row.name}</td>
-        <td>${row.byuId}</td>
-        <td>${row.netId}</td>
-        <td>${row.employeeStatus}</td>
-        <td>${row.studentStatus}</td>
-      </tr>
-    `;
-
-    const renderAdditionalInfo = row => {
-      if (row.showAdditionalInfo && row.additionalInfo) {
-        return html`
-          <ul>
-            ${row.additionalInfo.map(line => html`<li>${line}</li>`)}
-          </ul>
-        `
-      }
-      return html`<div></div>`
-    };
-
-    const [, , , , envelopeIconPath] = faEnvelope.icon;
-    const [, , , , phoneIconPath] = faPhone.icon;
-    const [, , , , homeIconPath] = faHome.icon;
-    const [, , , , closeIconPath] = faTimes.icon;
-    const closeIcon = svg`
-    <path d=${closeIconPath} fill="white" transform="translate(90)"/>
-    `;
-    const renderIcon = path => html`
-      <svg width="14" height="14" viewBox="0 0 512 512">
-        ${svg`<path d=${path} fill="#666666"/>`}
-      </svg>
-    `;
-
-    const renderDirectoryCard = row => html`
-      <div class="card" @click=${e => this.select(row)}>
-        <h3>${row.name}</h3>
-        ${renderAdditionalInfo(row)}
-        <div class="contact">
-          <div>${renderIcon(envelopeIconPath)}${row.email}</div>
-          <div>${renderIcon(phoneIconPath)}${row.phone}</div>
-          <div>${renderIcon(homeIconPath)}${row.address ? renderAddress(row.address) : ''}</div>
-        </div>
-      </div>
-    `;
-    const renderAdmin = results => html`
-      <table>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>BYU ID</th>
-            <th>Net ID</th>
-            <th>EMP Status</th>
-            <th>STD Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${results.map(r => renderAdminRow(r))}
-          ${this.searchPending ? renderPlaceholderRows() : ''}
-        </tbody>
-      </table>
-    `;
-
-    const renderDirectory = results => html`
-      <div class="deck">
-        ${results.map(r => renderDirectoryCard(r))}
-        ${this.searchPending ? renderPlaceholderCards() : ''}
-      </div>
-    `;
-
-    if (!this.results || !this.results.map || this.results.length < 1) {
-      return html``
-    }
-
-    return html`
-      <div class="modal">
-        <div class="results">
-          <h2 id="top">Lookup Results</h2>
-          ${this.context && this.context === 'admin' ? renderAdmin(this.results) : renderDirectory(this.results)}
-          <div class="spacer"></div>
-          ${IntersectionObserver
-    ? html`<button id="bottom" class="nav-btn" @click=${this.close}>Close</button>`
-    : html`<div>
-             <button class="nav-btn" @click=${this.prev}>Prev</button>
-             <button class="nav-btn" @click=${this.next}>Next</button>
-           </div>`}
-        </div>
-        <button class="close-modal" @click=${e => this.close()}>
-          <svg alt="Search" width="24" height="24" viewBox="0 0 512 512">
-            ${closeIcon}
-          </svg>
-        </button>
-      </div>
-    `
-  }
-
-  dispatch (type, detail) {
-    const options = detail
-      ? { detail, bubbles: true, composed: true }
-      : { bubbles: true, composed: true };
-    const evt = new CustomEvent(type, options);
+class ByuPersonsv3Datasource extends LitElement {
+  connectedCallback () {
+    super.connectedCallback();
+    connect();
+    const evt = new CustomEvent$1('byu-lookup-datasource-register', { bubbles: true });
     this.dispatchEvent(evt);
   }
 
-  select (row) {
-    const { personId, byuId, netId, name } = row;
-    this.dispatch('byu-lookup-results-select', {
-      personId,
-      byuId,
-      netId,
-      name
-    });
-    this.close();
+  disconnectedCallback () {
+    super.disconnectedCallback();
+    disconnect();
   }
 
-  close () {
-    this.dispatch('byu-lookup-results-close');
-    this.isObserving = false;
-  }
-
-  next () {
-    if (this.searchPending) {
-      return
-    }
-    this.dispatch('byu-lookup-next-page');
-  }
-
-  prev () {
-    if (this.searchPending) {
-      return
-    }
-    this.dispatch('byu-lookup-prev-page');
-  }
-}
-
-/*
- * Copyright 2018 Brigham Young University
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-class ByuPersonLookup extends LitElement {
   static get properties () {
     return {
-      context: { type: String, reflect: true },
-      compact: { type: Boolean },
-      noAutoselect: { type: Boolean, attribute: 'no-autoselect' }
+      search: { type: String },
+      next: { type: String },
+      prev: { type: String }
     }
-  }
-
-  static get styles () {
-    return [
-      css` :host { display: inline-block; } :host([hidden]) { display: none; } `,
-      css` div { position: relative; padding: 1rem; } `,
-      css` .small-padding { padding: 0.25rem; } `,
-      css` label { position: absolute; left: 1rem; top: -0.1rem; font-size: 0.7rem; color: #999; } `,
-      css` input[type="search"] {
-        padding: 0.3rem;
-        border: thin solid #666666;
-        border-radius: 0.2rem;
-        margin-right: 0.2rem;
-        min-width: 15rem;
-        font-size: 1.1rem;
-      } `,
-      css` button {
-        padding: 0.3rem 1rem;
-        border: thin solid #666666;
-        border-radius: 0.05rem;
-        background-color: #0057B8;
-        color: white;
-        cursor: pointer;
-        font-size: 1.1rem;
-      } `,
-      css` button:hover, button:active { box-shadow: inset 0 0 0.2rem rgba(255, 255, 255, 0.5); background-color: #5199E1; } `,
-      css` .spin { animation: spin 1500ms linear infinite; } `,
-      css` .container { position: relative; font-size: 1.1rem; } `,
-      css` .hidden { display: none; } `,
-      css` .error-display {
-        background-color: rgba(179, 4, 26, 0.95);
-        color: white;
-        position: absolute;
-        top: 3.7rem;
-        box-shadow: 0rem 0.1rem 0.1rem rgba(0, 0, 0, 0.2);
-        z-index: 19;
-      } `,
-      css` .error-handle { position: absolute; top: -10px; } `,
-      css` @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } } .search-btn-label { display: none; } `,
-      css` .compact { display: flex; padding: 0; }`,
-      css` .compact > label { position: static; font-size: 0.9rem; align-self: center; margin: 0rem 0.2rem; } `,
-      css` .compact > input[type="search"] { border-radius: 0; margin-right: 0; min-width: 10rem; font-size: 0.9rem; }`,
-      css` .compact > button { border-radius: 0; font-size: 0.9rem; }`,
-      css` .compact > button .search-btn-label { display: none; } `,
-      css` .compact .error-display { top: 2.5rem; } `,
-      css` @media not speech { .sr-only { display: none; } } `,
-      css` @media only screen and (min-width: 470px) { .search-btn-label { display: inline-block; } } `,
-      css` .center-vertically {
-        padding: 0 0.3rem;
-        display: inline-flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        position: relative;
-        top: 0.3rem;
-      }`,
-      css` .compact > .center-vertically {
-        top: 0;
-      }`,
-      css` .search-info-icon > .search-info {
-        transform-origin: top right;
-        transform: scale(0, 0);
-        opacity: 0;
-        position: absolute;
-        top: calc(0.3rem + 23px);
-        background-color: rgba(20,20,20,0.9);
-        width: 20rem;
-        padding; 0.5rem;
-        z-index: 19;
-        transition: opacity 120ms ease-out, transform 500ms ease 120ms;
-      }`,
-      css` .search-info { right: 0rem; }`,
-      css` .search-info.position-to-right { transform-origin: top; left: -8rem; }`,
-      css` .compact > .center-vertically > .search-info { top: 30px; }`,
-      css` .search-info div { padding: 0; color: white; }`,
-      css` .search-info-handle {
-        position: absolute;
-        top: -10px;
-        right: 11px;
-      }`,
-      css` .position-to-right > .search-info-handle { left: calc(8rem + 11px); }`,
-      css` .search-info-icon:hover > .search-info { transform: scale(1, 1); opacity: 1; }`,
-      css` .hidden { display: none; }`
-    ]
-  }
-
-  constructor () {
-    super();
-    this.context = 'directory';
-    this.compact = false;
-    this.noAutoselect = false;
-    this.errorMessage = '';
-    this.errorType = '';
-    this.results = null;
-    this.search = '';
-    this.searchPending = false;
-    this.hasSearchInfoSlotted = false;
   }
 
   render () {
-    const {
-      context,
-      results,
-      search
-    } = this;
-    // console.log(`search=${search}, context=${context}`)
-    const [, , , , searchIconPath] = faSearch.icon;
-    const [, , , , spinIconPath] = faSpinner.icon;
-    const [, , , , banIconPath] = faBan.icon;
-    const [, , , , warnIconPath] = faExclamationTriangle.icon;
-    const [, , , , helpIconPath] = faQuestionCircle.icon;
-
-    const bounding = this.getBoundingClientRect();
-    console.log('Bounding Rect:\n', bounding);
-    const helpTextOnRight = bounding.left < bounding.width;
-    const searchInfo = html`
-    <div class=${this.hasSearchInfoSlotted ? 'search-info-icon center-vertically' : 'hidden search-info-icon center-vertically'}>
-      <svg alt="How to use" width="21" height="21" viewBox="0 0 578 512">
-        <circle cx="260" cy="260" r="260" fill="white" />
-      ${svg`
-        <path
-          d=${helpIconPath}
-          fill="#0057B8"
-        />
-      `}
-      </svg>
-      <div class=${helpTextOnRight ? 'search-info position-to-right' : 'search-info'}>
-        <svg class="search-info-handle" width="10" height="10" viewBox="0 0 100 100">
-          <path d="M50,0 L100,100 L0,100 Z" fill="rgba(20, 20, 20, 0.9)">
-        </svg>
-        <div>
-          <slot @slotchange=${this.helpTextSlotChange} name="help-text"></slot>
-        </div>
-      </div>
-    </div>
-    `;
-
-    return html`
-    <div class=${this.compact ? 'compact container' : 'container'}>
-      <label for="search">
-        <slot>
-          No Data Provider
-        </slot>
-      </label>
-      <input
-        id="search"
-        type="search"
-        size="12"
-        .value=${search}
-        @input=${this.searchChange}
-        @search=${this.doSearch}
-        @keyup=${this.submitOnEnter}
-      >
-      <button @click=${this.doSearch}>
-        <svg class=${this.searchPending ? 'spin' : ''} alt="Search" width="14" height="14" viewBox="0 0 512 512">
-          ${svg`
-            <path
-              d=${this.searchPending ? spinIconPath : searchIconPath}
-              fill="white"
-            />
-          `}
-        </svg>
-        <span class="search-btn-label">
-          ${this.searchPending ? 'Searching' : 'Search'}
-        </span>
-      </button>
-      ${searchInfo}
-      <slot name="error">
-        <div class=${this.errorType === '' ? 'hidden' : 'error-display'}>
-          <svg class="error-handle" width="10" height="10" viewBox="0 0 100 100">
-            <path d="M50,0 L100,100 L0,100 Z" fill="rgba(179, 4, 26, 0.8)">
-          </svg>
-          <svg alt=${this.errorType} width="14" height="14" viewBox="0 0 578 512">
-          ${svg`
-            <path
-              d=${this.errorType === 'No Results' ? banIconPath : warnIconPath}
-              fill="white"
-            />
-          `}
-          </svg>
-          ${this.errorType === 'No Results' ? this.errorMessage : html`
-          Oops! Something went wrong. <div class="small-padding"><small>${this.errorMessage}</small></div>
-          `}
-        </div>
-      </slot>
-    </div>
-    <slot name="results">
-      <byu-person-lookup-results
-        class=${results && results.length > 0 ? '' : 'hidden'}
-        .results=${results}
-        .context=${context}
-        .searchPending=${this.searchPending}
-        .noAutoselect=${this.noAutoselect}
-        @byu-lookup-results-close=${this.closeResults}
-        @byu-lookup-next-page=${this.loadNextPage}
-        @byu-lookup-prev-page=${this.loadPrevPage}
-      ></byu-person-lookup-results>
-    </slot>
-    `
+    if (!this.search) {
+      this.search = '';
+    }
+    const { label } = resolveSearchType(this.search);
+    return html`${label}`
   }
 
-  closeResults () {
-    this.results = null;
-    this.requestUpdate();
-
-    this.setPropsOnSearchResults({
-      results: null
-    });
+  async performSearch (search$$1) {
+    if (this.timeout) {
+      clearTimeout(this.timeout);
+    }
+    this.timeout = setTimeout(async () => {
+      setPendingSearch(this);
+      const { next, prev } = await executePersonsv3Request(this.search, this);
+      this.next = next;
+      this.prev = prev;
+    }, 100);
   }
 
-  registerProvider (provider) {
-    this.__lookupProvider = provider;
-    this.addEventListener('byu-lookup-datasource-result', this.searchResults);
-    this.addEventListener('byu-lookup-datasource-error', this.searchError);
-    this.addEventListener('byu-lookup-datasource-searching', this.searchBegun);
-
-    this.addEventListener('byu-lookup-results-close', this.closeResults);
-    this.addEventListener('byu-lookup-next-page', this.loadNextPage);
-    this.addEventListener('byu-lookup-prev-page', this.loadPrevPage);
-
-    this.fetchFromProvider = this.__lookupProvider.performSearch;
-    this.nextPageFromProvider = this.__lookupProvider.nextPage;
-    this.prevPageFromProvider = this.__lookupProvider.prevPage;
-  }
-
-  async connectedCallback () {
-    super.connectedCallback();
-
-    await this.requestUpdate();
-
-    const providerSlot = this.shadowRoot.querySelector('slot');
-    if (providerSlot) {
-      const assignedNodes = Array.from(providerSlot.assignedNodes());
-      const provider = assignedNodes.find(e => e.performSearch);
-      if (provider) {
-        this.registerProvider(provider);
-        return
+  async nextPage () {
+    if (this.timeout) {
+      clearTimeout(this.timeout);
+    }
+    this.timeout = setTimeout(async () => {
+      if (this.next) {
+        setPendingSearch(this);
+        const { next, prev } = await executePersonsv3Request(this.search, this, this.next);
+        this.next = next;
+        this.prev = prev;
       }
+    }, 100);
+  }
+
+  async prevPage () {
+    if (this.timeout) {
+      clearTimeout(this.timeout);
     }
-    const providerErrorFn = () => { throw new Error('No valid lookup provider found!') };
-    const timeout = setTimeout(providerErrorFn, 10000);
-    this.addEventListener('byu-lookup-datasource-register', (e) => {
-      e.stopPropagation();
-      this.registerProvider(e.target);
-      clearTimeout(timeout);
-    });
-
-    const helpTextSlot = this.shadowRoot.querySelector('slot[name=\'help-text\'');
-    const helpTextNodes = helpTextSlot.assignedNodes();
-    if (helpTextNodes.length > 0) {
-      this.hasSearchInfoSlotted = true;
-    }
-
-    this.requestUpdate();
-  }
-
-  setPropsOnSearchResults (payload) {
-    const resultsSlot = this.shadowRoot.querySelector('slot[name=\'results\'');
-    const resultsNodes = resultsSlot.assignedNodes();
-    if (resultsNodes.length === 0) return
-
-    const el = resultsNodes[0];
-    Object.entries(payload).forEach(([key, value]) => {
-      el[key] = value;
-    });
-  }
-
-  searchResults (e) {
-    e.stopPropagation(); // Don't trigger any other lookup components
-    // console.log('search results:\n', e.detail)
-    /*
-    this.results = Array.isArray(this.results)
-    ? this.results.length > 120
-    ? this.results.slice(-120)
-    : this.results
-    : []
-    */
-    this.searchPending = false;
-    if (e.detail.length === 0 && this.results.length === 0) {
-      this.errorMessage = 'Hmmm, we couldn\'t find anyone.';
-      this.errorType = 'No Results';
-      this.requestUpdate();
-      return
-    }
-    this.results = this.results.concat(e.detail);
-    this.requestUpdate();
-    this.setPropsOnSearchResults({
-      searchPending: false,
-      results: this.results
-    });
-  }
-
-  searchError (e) {
-    e.stopPropagation(); // Don't trigger any other lookup components
-    this.searchPending = false;
-    // window.alert(e.detail)
-    this.errorMessage = e.detail;
-    this.errorType = 'Service Error';
-    console.error('search error:\n', e.detail);
-    this.requestUpdate();
-    this.setPropsOnSearchResults({
-      searchPending: false
-    });
-  }
-
-  searchBegun (e) {
-    e.stopPropagation(); // Don't trigger any other lookup components
-    this.searchPending = true;
-    this.requestUpdate();
-    this.setPropsOnSearchResults({
-      searchPending: true
-    });
-  }
-
-  searchChange (e) {
-    this.errorMessage = '';
-    this.errorType = '';
-    this.search = e.target.value;
-    // console.log(`search=${this.search}`)
-    if (this.__lookupProvider) {
-      const search = this.search;
-      this.__lookupProvider.search = search;
-    }
-    this.requestUpdate();
-  }
-
-  submitOnEnter (e) {
-    if (e.key === 'Enter') {
-      this.doSearch();
-    }
-  }
-
-  helpTextSlotChange (e) {
-    const helpTextSlot = this.shadowRoot.querySelector('slot[name=\'help-text\'');
-    const helpTextNodes = helpTextSlot.assignedNodes();
-    if (helpTextNodes.length > 0) {
-      this.hasSearchInfoSlotted = true;
-    } else {
-      this.hasSearchInfoSlotted = false;
-    }
-    this.requestUpdate();
-  }
-
-  doSearch () {
-    // console.log(`doSearch:search: ${this.search}`)
-    this.errorMessage = '';
-    this.errorType = '';
-    this.results = [];
-    if (this.search.length > 0) {
-      this.fetchFromProvider.call(this.__lookupProvider, this.search);
-    }
-    this.requestUpdate();
-  }
-
-  loadNextPage () {
-    // console.log(`loadNextPage`)
-    this.nextPageFromProvider.call(this.__lookupProvider);
-  }
-
-  loadPrevPage () {
-    // console.log(`loadPrevPage`)
-    this.prevPageFromProvider.call(this.__lookupProvider);
+    this.timeout = setTimeout(async () => {
+      if (this.prev) {
+        setPendingSearch(this);
+        const { next, prev } = await executePersonsv3Request(this.search, this, this.prev);
+        this.next = next;
+        this.prev = prev;
+      }
+    }, 100);
   }
 }
 
-console.log('registering person lookup');
-window.customElements.define('byu-person-lookup', ByuPersonLookup);
-
-console.log('registering person lookup results');
-window.customElements.define('byu-person-lookup-results', ByuPersonLookupResults);
+console.log('registering personsv3 datasource');
+window.customElements.define('byu-personsv3-datasource', ByuPersonsv3Datasource);
