@@ -3412,7 +3412,7 @@ class ByuPersonsv3Datasource extends LitElement {
     }
     this.timeout = setTimeout(async () => {
       setPendingSearch(this);
-      const { next, prev } = await executePersonsv3Request(this.search, this);
+      const { next, prev } = await executePersonsv3Request(search$$1, this);
       this.next = next;
       this.prev = prev;
     }, 100);

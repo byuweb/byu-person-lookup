@@ -3441,7 +3441,7 @@ class ByuPersonsv2Datasource extends LitElement {
     }
     this.timeout = setTimeout(async () => {
       setPendingSearch(this);
-      const results = await executePersonsv2Request(this.search, this) || {};
+      const results = await executePersonsv2Request(search$$1, this) || {};
       if (results) {
         const { next, prev } = results;
         this.next = next;

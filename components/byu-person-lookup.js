@@ -377,8 +377,9 @@ class ByuPersonLookup extends LitElement {
     this.errorMessage = ''
     this.errorType = ''
     this.results = []
-    if (this.search.length > 0) {
-      this.fetchFromProvider.call(this.__lookupProvider, this.search)
+    const searchText = this.search.trim()
+    if (searchText.length > 0) {
+      this.fetchFromProvider.call(this.__lookupProvider, searchText)
     }
     this.requestUpdate()
   }
