@@ -1009,22 +1009,22 @@ function parseAddresses (addresses) {
     return null
   }
   return addresses.values
-    .filter(address => address.metadata.validation_response.code === 200)
-    .reduce((all, c) => {
-      const data = [
-        lodash_get(c, 'address_line_1.value', ''),
-        lodash_get(c, 'address_line_2.value', ''),
-        lodash_get(c, 'address_line_3.value', ''),
-        lodash_get(c, 'address_line_4.value', '')
-      ].filter(l => l.trim().length > 0);
-      const key = {
-        'MAL': 'mailing',
-        'RES': 'residential',
-        'WRK': 'work',
-        'PRM': 'permanent'
-      }[c.address_type.value] || c.address_type.value;
-      return Object.assign({}, all, { [key]: data })
-    }, {})
+      .filter(address => address.metadata.validation_response.code === 200)
+      .reduce((all, c) => {
+        const data = [
+          lodash_get(c, 'address_line_1.value', ''),
+          lodash_get(c, 'address_line_2.value', ''),
+          lodash_get(c, 'address_line_3.value', ''),
+          lodash_get(c, 'address_line_4.value', '')
+        ].filter(l => l.trim().length > 0);
+        const key = {
+          'MAL': 'mailing',
+          'RES': 'residential',
+          'WRK': 'work',
+          'PRM': 'permanent'
+        }[c.address_type.value] || c.address_type.value;
+        return Object.assign({}, all, { [key]: data })
+      }, {})
 }
 
 function parseBasic (basic) {
@@ -1045,8 +1045,8 @@ function parseEmailAddresses (emailAddresses) {
     return null
   }
   return emailAddresses.values.map(e => lodash_get(e, 'email_address.value', ''))
-    .filter(e => !!e)
-    .reduce(pickFirst, '')
+      .filter(e => !!e)
+      .reduce(pickFirst, '')
 }
 
 function parsePhones (phones) {
@@ -1054,27 +1054,22 @@ function parsePhones (phones) {
     return null
   }
   return phones.values.map(p => lodash_get(p, 'phone_number.value', ''))
-    .filter(p => !!p)
-    .reduce(pickFirst, '')
+      .filter(p => !!p)
+      .reduce(pickFirst, '')
 }
 
 function parseEmployeeSummaries (employeeSummaries) {
   if (employeeSummaries.metadata.validation_response.code !== 200) {
     return null
   }
+  const isActive = lodash_get(employeeSummaries, 'is_active.value');
+  const activeStatus = isActive ? 'Active' : 'Not Active';
   return {
-    employeeStatus: lodash_get(employeeSummaries, 'employee_role.value'),
-    department: lodash_get(employeeSummaries, 'department.value'),
-    jobTitle: lodash_get(employeeSummaries, 'job_title.description')
+    employeeStatus: `${lodash_get(employeeSummaries, 'employee_or_contingent_worker_type.value')} (${activeStatus})`,
+    department: lodash_get(employeeSummaries, 'supervisory_org.value'),
+    jobTitle: lodash_get(employeeSummaries, 'business_title.value'),
+    isActive: isActive
   }
-}
-
-function parseStudentSummaries (studentSummaries) {
-  if (studentSummaries.metadata.validation_response.code !== 200) {
-    return null
-  }
-  const studentStatus = lodash_get(studentSummaries, 'student_status.value');
-  return { studentStatus }
 }
 
 function pickAddress (addrs) {
@@ -1083,13 +1078,6 @@ function pickAddress (addrs) {
   if (addrs.residential) return addrs.mailing
   if (addrs.permanent) return addrs.permanent
   return []
-}
-
-function isEmployee (results) {
-  if (results.employeeStatus) {
-    return /ACT|LEV/.test(results.employeeStatus)
-  }
-  return results.department && results.jobTitle
 }
 
 function buildAdditionalInfo (results) {
@@ -1103,14 +1091,13 @@ function buildAdditionalInfo (results) {
 
 function parsePerson (data) {
   const results = Object.assign(
-    {
-      addresses: parseAddresses(data.addresses),
-      email: parseEmailAddresses(data.email_addresses),
-      phone: parsePhones(data.phones)
-    },
-    parseBasic(data.basic),
-    parseEmployeeSummaries(data.employee_summary),
-    parseStudentSummaries(data.student_summary)
+      {
+        addresses: parseAddresses(data.addresses),
+        email: parseEmailAddresses(data.email_addresses),
+        phone: parsePhones(data.phones)
+      },
+      parseBasic(data.basic),
+      parseEmployeeSummaries(data.employee_summary),
   );
   const address = pickAddress(results.addresses);
   const {
@@ -1119,10 +1106,9 @@ function parsePerson (data) {
     name,
     byuId,
     netId,
-    employeeStatus,
-    studentStatus
+    employeeStatus
   } = results;
-  const showAdditionalInfo = isEmployee(results);
+  const showAdditionalInfo = results.isActive;
   const additionalInfo = showAdditionalInfo ? buildAdditionalInfo(results) : [];
   return {
     address,
@@ -1132,7 +1118,6 @@ function parsePerson (data) {
     byuId,
     netId,
     employeeStatus,
-    studentStatus,
     showAdditionalInfo,
     additionalInfo
   }
@@ -1193,7 +1178,7 @@ async function search (searchText, pageLink) {
     headers: new window.Headers({ 'Authorization': authHeader })
   };
 
-  const fieldSets = 'basic,addresses,email_addresses,phones,employee_summary,student_summary';
+  const fieldSets = 'basic,addresses,email_addresses,phones,employee_summary';
   q.append('field_sets', fieldSets);
 
   q.append('page_size', '50');
