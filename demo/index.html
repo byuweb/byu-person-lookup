@@ -15,6 +15,7 @@
     <script type="module" src="https://cdn.byu.edu/byu-person-lookup/latest/byu-person-lookup-bundle.min.js"></script>
     <script type="module" src="https://cdn.byu.edu/byu-person-lookup/latest/byu-personsv2-datasource-bundle.min.js"></script>
     <script type="module" src="https://cdn.byu.edu/byu-person-lookup/latest/byu-personsv3-datasource-bundle.min.js"></script>
+    <script type="module" src="https://cdn.byu.edu/byu-person-lookup/latest/byu-personsv4-datasource-bundle.min.js"></script>
     <!-- <script type="module" src="../dist/byu&#45;person&#45;lookup&#45;bundle.js"></script> -->
     <!-- <script type="module" src="../dist/byu&#45;personsv2&#45;datasource&#45;bundle.js"></script> -->
     <!-- <script type="module" src="../dist/byu&#45;personsv3&#45;datasource&#45;bundle.js"></script> -->
@@ -29,10 +30,10 @@
 
     <div id="content">
 
-<!--        <h2>PersonsV4 Lookup (not in production until March)</h2>-->
-<!--        <byu-person-lookup id="lookup-3" context="directory">-->
-<!--            <byu-personsv4-datasource></byu-personsv4-datasource>-->
-<!--        </byu-person-lookup>-->
+        <h2>PersonsV4 Lookup</h2>
+        <byu-person-lookup id="lookup-4" context="directory">
+            <byu-personsv4-datasource></byu-personsv4-datasource>
+        </byu-person-lookup>
 
         <h2>PersonsV3 Lookup</h2>
         <byu-person-lookup id="lookup-3" context="directory">
@@ -146,10 +147,17 @@
             selectionElem.textContent = `Selected person ${JSON.stringify(e.detail, null, 2)}`
         })
 
+        document.getElementById('lookup-4').addEventListener('byu-lookup-results-select', e => {
+            console.log(`Selected byuId: ${e.detail}`)
+            const selectionElem = document.getElementById('selection')
+            selectionElem.textContent = `Selected person ${JSON.stringify(e.detail, null, 2)}`
+        })
+
         document.getElementById('searchContext').addEventListener('change', e => {
             const val = e.target.value
             document.getElementById('lookup-2').setAttribute('context', val)
             document.getElementById('lookup-3').setAttribute('context', val)
+            document.getElementById('lookup-4').setAttribute('context', val)
         })
 
         document.getElementById('searchCompact').addEventListener('change', e => {
@@ -157,9 +165,11 @@
             if (val) {
                 document.getElementById('lookup-2').setAttribute('compact', '')
                 document.getElementById('lookup-3').setAttribute('compact', '')
+                document.getElementById('lookup-4').setAttribute('compact', '')
             } else {
                 document.getElementById('lookup-2').removeAttribute('compact')
                 document.getElementById('lookup-3').removeAttribute('compact')
+                document.getElementById('lookup-4').removeAttribute('compact')
             }
         })
 
@@ -168,9 +178,11 @@
             if (val) {
                 document.getElementById('lookup-2').setAttribute('no-autoselect', '')
                 document.getElementById('lookup-3').setAttribute('no-autoselect', '')
+                document.getElementById('lookup-4').setAttribute('no-autoselect', '')
             } else {
                 document.getElementById('lookup-2').removeAttribute('no-autoselect')
                 document.getElementById('lookup-3').removeAttribute('no-autoselect')
+                document.getElementById('lookup-4').removeAttribute('no-autoselect')
             }
         })
 
